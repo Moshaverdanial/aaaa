@@ -1,0 +1,21 @@
+{
+  "name": "dastyar-ai-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "دستیار هوش مصنوعی فارسی (RTL) — رایگان، متن‌باز، با کلید API شخصی شما",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node tests/api.test.mjs",
+    "test:api": "node tests/api.test.mjs",
+    "test:ui": "node tests/ui.test.mjs",
+    "test:all": "node tests/api.test.mjs && node tests/ui.test.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}
