@@ -28,6 +28,7 @@
   const TOOL_LINKS = [
     ['/valuation', 'sparkle', 'برآورد قیمت هوشمند'], ['/market', 'chart', 'تحلیل بازار و قیمت محله‌ها'], ['/tools', 'calc', 'ماشین‌حساب‌های مسکن'],
     ['/compare', 'compare', 'مقایسه‌ی املاک'], ['/requests', 'target', 'تابلوی درخواست ملک'],
+    ['/sell', 'home', 'ملکت را به دال بسپار'], ['/want', 'search', 'دنبال ملک می‌گردم'],
   ];
 
   ui.renderHeader = function () {
@@ -56,7 +57,7 @@
           <div class="dd" id="bell-dd"><button class="hbtn" aria-label="اعلان‌ها" aria-haspopup="true">${icon('bell', 20)}<span class="dot-badge bell-badge ${n?.unread ? '' : 'hide'}">${num(n?.unread || 0)}</span></button><div class="dd-menu notif" id="bell-menu"></div></div>
           <div class="dd"><button class="user-pill" aria-haspopup="true">${Dal.avatar(u, 34)}<span>${u.name.split(' ')[0]}</span></button>
             <div class="dd-menu"><div style="padding:8px 12px"><b>${u.name}</b><div class="muted" style="font-size:12.5px">${{ admin: 'مدیر سیستم', agent: 'مشاور املاک', user: 'کاربر' }[u.role]}</div></div><hr>
-              <a href="#/dashboard">${icon('layers', 18)} داشبورد من</a><a href="#/book">${icon('lock', 18)} دفترچه‌ی دال</a><a href="#/dashboard/listings">${icon('building', 18)} آگهی‌های من</a><a href="#/messages">${icon('msg', 18)} پیام‌ها ${n?.messages ? html`<span class="pill info">${num(n.messages)}</span>` : ''}</a><a href="#/dashboard/profile">${icon('settings', 18)} تنظیمات حساب</a>
+              <a href="#/dashboard">${icon('layers', 18)} داشبورد من</a><a href="#/book">${icon('lock', 18)} دفترچه‌ی دال</a>${Dal.isAgent() ? html`<a href="#/deals">${icon('chart', 18)} میزکار معاملات</a>` : ''}<a href="#/dashboard/listings">${icon('building', 18)} آگهی‌های من</a><a href="#/messages">${icon('msg', 18)} پیام‌ها ${n?.messages ? html`<span class="pill info">${num(n.messages)}</span>` : ''}</a><a href="#/dashboard/profile">${icon('settings', 18)} تنظیمات حساب</a>
               ${u.role === 'admin' ? html`<a href="#/admin">${icon('shield', 18)} پنل مدیریت</a>` : ''}<hr><a href="#" id="logout-btn">${icon('logout', 18)} خروج</a></div></div>`
         : html`<a class="btn ghost hide-sm" href="#/login">ورود</a>`}
         <a class="btn primary hide-sm" href="#/new">${icon('plus', 18)} ثبت آگهی</a>
@@ -102,7 +103,7 @@
   ui.renderFooter = function () {
     mount($('#footer'), html`<div class="container"><div class="footer-grid">
       <div><a href="#/" class="logo" style="color:#fff"><span class="logo-mark">د</span><span>دال</span></a><p style="margin-top:14px;line-height:2">پلتفرم فارسی آگهی ملک؛ با جستجوی هوشمند، برآورد قیمت، نقشه‌ی تعاملی، مشاوران تأییدشده و ابزارهای محاسبه‌ی مسکن.</p></div>
-      <div><h5>خرید و اجاره</h5><a href="#/search?deal=sale">خرید ملک</a><a href="#/search?deal=rent">رهن و اجاره</a><a href="#/search?deal=presale">پیش‌فروش</a><a href="#/search?view=map">جستجو روی نقشه</a><a href="#/requests">درخواست ملک</a></div>
+      <div><h5>خرید و اجاره</h5><a href="#/search?deal=sale">خرید ملک</a><a href="#/search?deal=rent">رهن و اجاره</a><a href="#/search?deal=presale">پیش‌فروش</a><a href="#/search?view=map">جستجو روی نقشه</a><a href="#/requests">درخواست ملک</a><a href="#/sell">ملکت را بسپار</a><a href="#/city/kangan">املاک بندر کنگان</a><a href="#/city/shiraz">املاک شیراز</a></div>
       <div><h5>ابزارها</h5><a href="#/valuation">برآورد قیمت</a><a href="#/market">تحلیل بازار</a><a href="#/tools">ماشین‌حساب وام و اجاره</a><a href="#/compare">مقایسه‌ی املاک</a></div>
       <div><h5>دال</h5><a href="#/about">درباره‌ی ما</a><a href="#/agents">مشاوران</a><a href="#/magazine">مجله‌ی دال</a><a href="#/new">ثبت آگهی رایگان</a><a href="#/about?faq=1">سؤالات متداول</a></div>
       <div><h5>تماس با مشاوره</h5>${Dal.site().phones.map((p) => html`<a href="tel:+98${p.slice(1)}" dir="ltr" style="text-align:right">${icon('phone', 14)} ${Dal.fmtPhone(p)}</a>`)}<a href="https://wa.me/98${Dal.site().whatsapp.slice(1)}" target="_blank" rel="noopener">واتساپ</a>${Dal.site().bale ? html`<a href="https://ble.ir/${Dal.site().bale}" target="_blank" rel="noopener">بله</a>` : ''}${Dal.site().eitaa ? html`<a href="https://eitaa.com/${Dal.site().eitaa}" target="_blank" rel="noopener">ایتا</a>` : ''}${Dal.site().telegram ? html`<a href="https://t.me/${Dal.site().telegram}" target="_blank" rel="noopener">تلگرام</a>` : ''}<a href="#/consult">${Dal.focusCities().map((c) => c.name).join(' و ')}</a></div></div>
@@ -118,7 +119,7 @@
         <a href="#/search?deal=sale">${icon('home', 20)} خرید</a><a href="#/search?deal=rent">${icon('key', 20)} رهن و اجاره</a><a href="#/search?deal=presale">${icon('building', 20)} پیش‌فروش</a><a href="#/search?view=map">${icon('map', 20)} نقشه</a><a href="#/agents">${icon('users', 20)} مشاوران</a>
         <div class="divider"></div>${TOOL_LINKS.map(([h, i, t]) => html`<a href="#${h}">${icon(i, 20)} ${t}</a>`)}<div class="divider"></div>
         <a href="#/magazine">${icon('book', 20)} مجله</a><a href="#/about">${icon('info', 20)} درباره‌ی دال</a>
-        ${u ? html`<a href="#/dashboard">${icon('user', 20)} داشبورد</a><a href="#/messages">${icon('msg', 20)} پیام‌ها</a><a href="#/book">${icon('lock', 20)} دفترچه‌ی دال</a>` : html`<a href="#/login">${icon('user', 20)} ورود / ثبت‌نام</a>`}
+        ${u ? html`<a href="#/dashboard">${icon('user', 20)} داشبورد</a><a href="#/messages">${icon('msg', 20)} پیام‌ها</a><a href="#/book">${icon('lock', 20)} دفترچه‌ی دال</a>${Dal.isAgent() ? html`<a href="#/deals">${icon('chart', 20)} میزکار معاملات</a>` : ''}` : html`<a href="#/login">${icon('user', 20)} ورود / ثبت‌نام</a>`}
         <a class="btn primary block" href="#/new" style="margin-top:12px;color:#fff">${icon('plus', 18)} ثبت آگهی رایگان</a></aside>`);
       requestAnimationFrame(() => d.classList.add('open'));
     } else { d.classList.remove('open'); }
@@ -157,7 +158,7 @@
     const items = [
       ['/', 'home', 'صفحه‌ی اصلی'], ['/search?deal=sale', 'home', 'خرید ملک'], ['/search?deal=rent', 'key', 'رهن و اجاره'], ['/search?deal=presale', 'building', 'پیش‌فروش'], ['/search?view=map', 'map', 'جستجو روی نقشه'],
       ['/valuation', 'sparkle', 'برآورد قیمت ملک'], ['/market', 'chart', 'تحلیل بازار'], ['/tools', 'calc', 'ماشین‌حساب‌ها'], ['/tools?t=convert', 'refresh', 'تبدیل رهن به اجاره'], ['/tools?t=loan', 'dollar', 'ماشین‌حساب وام مسکن'], ['/tools?t=rentbuy', 'trend', 'اجاره یا خرید؟'],
-      ['/agents', 'users', 'مشاوران املاک'], ['/magazine', 'book', 'مجله'], ['/requests', 'target', 'درخواست ملک'], ['/compare', 'compare', 'مقایسه‌ی املاک'], ['/new', 'plus', 'ثبت آگهی جدید'], ['/book', 'lock', 'دفترچه‌ی دال'], ['/dashboard', 'layers', 'داشبورد'], ['/messages', 'msg', 'پیام‌ها'], ['/about', 'info', 'درباره‌ی دال'],
+      ['/agents', 'users', 'مشاوران املاک'], ['/magazine', 'book', 'مجله'], ['/requests', 'target', 'درخواست ملک'], ['/compare', 'compare', 'مقایسه‌ی املاک'], ['/new', 'plus', 'ثبت آگهی جدید'], ['/book', 'lock', 'دفترچه‌ی دال'], ['/sell', 'home', 'ملکت را به دال بسپار'], ['/want', 'search', 'دنبال ملک می‌گردم'], ['/city/kangan', 'pin', 'املاک بندر کنگان'], ['/city/shiraz', 'pin', 'املاک شیراز'], ...(Dal.isAgent() ? [['/deals', 'chart', 'میزکار معاملات و درآمد']] : []), ['/dashboard', 'layers', 'داشبورد'], ['/messages', 'msg', 'پیام‌ها'], ['/about', 'info', 'درباره‌ی دال'],
     ];
     const m = Dal.modal(html`<div class="palette"><input id="pal-in" placeholder="کجا بروم؟ یا جمله‌ای بنویسید: «آپارتمان ۲ خوابه در ونک»" autocomplete="off"><div class="pal-list" id="pal-list"></div><p class="muted" style="font-size:12px;margin-top:8px"><span class="kbd">Enter</span> برای باز کردن · <span class="kbd">Esc</span> برای بستن</p></div>`);
     const inp = $('#pal-in', m.body), list = $('#pal-list', m.body); let sel = 0, cur = [];

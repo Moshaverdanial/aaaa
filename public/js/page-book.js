@@ -92,6 +92,7 @@
     <div class="dc-meta muted">${e.next_follow ? html`<span>${icon('cal', 13)} پیگیری: ${dateFa(e.next_follow)}</span>` : ''}${e.last_contact ? html`<span>آخرین تماس: ${dateFa(e.last_contact)}</span>` : ''}${e.by ? html`<span>ثبت: ${e.by}</span>` : ''}</div>
     <div class="dc-actions">
       <button class="btn sm primary" data-act="match">${icon('sparkle', 15)} پیشنهاد هوشمند</button>
+      ${Dal.isAgent() ? html`<button class="btn sm" data-act="deal" title="ساخت پرونده‌ی معامله">${icon('layers', 15)} پرونده</button>` : ''}
       <button class="btn sm" data-act="touch">${icon('phone', 15)} ثبت تماس</button>
       ${isMobile(e.phone) ? html`<a class="btn sm" target="_blank" rel="noopener" href="${waLink(e.phone)}">${icon('msg', 15)}</a>` : ''}
       <button class="btn sm ghost" data-act="edit" aria-label="ویرایش">${icon('edit', 15)}</button>
@@ -257,6 +258,7 @@
       if (a === 'match') showMatches(e);
       else if (a === 'edit') openForm(data.cabinet, e, () => reload(true));
       else if (a === 'touch') touchModal(e, () => reload(true));
+      else if (a === 'deal') Dal.openDealForm({ title: `${e.kind === 'seeker' ? 'خواهان' : 'مالک'} ${e.name}${e.cityName ? '، ' + e.cityName : ''}`, kind: e.deal, city: e.city, district: (e.districts || [])[0] || '', client_name: e.name, client_phone: e.phone, price: e.kind === 'owner' ? e.price : (e.price_max || 0), rent: e.kind === 'owner' ? e.rent : (e.rent_max || 0), listing_id: e.listing_id || '', entry_id: e.id }, () => Dal.toast('پرونده در «میزکار معاملات» ساخته شد ✅', 'success'));
       else if (a === 'del' && await Dal.confirm(`«${e.name}» از کمد حذف شود؟`, { ok: 'حذف', danger: true })) { const r = await Dal.guard(() => Dal.api('/book/entries/' + e.id, { method: 'DELETE' })); if (r) { Dal.toast('حذف شد', 'success'); reload(true); } }
     });
     on(app, 'click', '[data-copy]', (ev, b) => copy(b.dataset.copy, 'پیام کپی شد ✅'));

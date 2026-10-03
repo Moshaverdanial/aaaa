@@ -11,6 +11,7 @@
   R('/dashboard', P.dashboard); R('/dashboard/:tab', P.dashboard);
   R('/messages', P.messages); R('/messages/:id', P.messages);
   R('/new', P.newListing); R('/edit/:id', P.newListing);
+  R('/deals', P.deals); R('/sell', P.lead); R('/want', P.lead); R('/city/:slug', P.city);
   R('/book', P.book); R('/book/:id', P.book);
   R('/admin', P.admin); R('/admin/:tab', P.admin);
 

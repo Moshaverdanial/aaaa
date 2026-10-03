@@ -87,7 +87,7 @@
       ${fc.map((c, i) => { const n = stats.byCity.find((x) => x.slug === c.slug)?.n || 0; return html`<div class="focus-card ${i === 0 ? 'k' : 's'}">
         <span class="badge" style="background:rgba(255,255,255,.22);align-self:flex-start">${icon('pin', 14)} ${i === 0 ? 'تمرکز اصلی دال' : 'تمرکز ویژه'}</span>
         <h3>${c.name}</h3><p>${i === 0 ? 'خرید، فروش، رهن و اجاره و سرمایه‌گذاری در محله‌ها و شهرک‌های بندر کنگان؛ با مشاوره‌ی مستقیم.' : 'آگهی و مشاوره‌ی ملک در محله‌های شیراز؛ از قصردشت و معالی‌آباد تا صدرا و گلستان.'}</p>
-        <div class="row gap wrap"><a class="btn" href="#/search?city=${c.slug}">${n ? num(n) + ' آگهی' : 'مشاهده‌ی آگهی‌ها'}</a><button class="btn ghost" data-consult="${c.slug}">${icon('phone', 16)} مشاوره</button><a class="btn ghost" href="#/market?city=${c.slug}">${icon('chart', 16)} بازار</a></div></div>`; })}
+        <div class="row gap wrap"><a class="btn" href="#/city/${c.slug}">${n ? num(n) + ' آگهی' : 'صفحه‌ی ' + c.name}</a><a class="btn ghost" href="#/sell?city=${c.slug}">${icon('home', 16)} می‌سپارم</a><button class="btn ghost" data-consult="${c.slug}">${icon('phone', 16)} مشاوره</button><a class="btn ghost" href="#/market?city=${c.slug}">${icon('chart', 16)} بازار</a></div></div>`; })}
     </div></div></section>
 
     ${recent.length ? html`<section class="section tight"><div class="container">${Dal.sectionHead('اخیراً دیده‌اید', 'ادامه‌ی جستجو از همان‌جایی که مانده بودید')}<div class="recent-strip">${recent.map((r) => html`<a class="recent" href="#/listing/${r.id}"><img src="${r.img}" alt="" loading="lazy"><div><b>${r.price.main} ${r.price.unit}</b>${r.title}</div></a>`)}</div></div></section>` : ''}
