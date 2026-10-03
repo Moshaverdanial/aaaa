@@ -1,0 +1,318 @@
+'use strict';
+/* آزمون سرتاسری روی یک پایگاه‌داده‌ی کاملاً خالی (بدون داده‌ی نمایشی) */
+const { test, before, after } = require('node:test');
+const assert = require('node:assert');
+const { spawn } = require('node:child_process');
+const os = require('node:os'); const fs = require('node:fs'); const path = require('node:path');
+
+const PORT = 3900 + Math.floor(Math.random() * 90);
+const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dal-'));
+let proc; const base = `http://127.0.0.1:${PORT}/api`;
+const call = async (p, o = {}) => {
+  const r = await fetch(base + p, { method: o.method || (o.body ? 'POST' : 'GET'), headers: { 'content-type': 'application/json', ...(o.token ? { authorization: 'Bearer ' + o.token } : {}) }, body: o.body ? JSON.stringify(o.body) : undefined });
+  const ct = r.headers.get('content-type') || ''; return { status: r.status, data: ct.includes('json') ? await r.json() : await r.text() };
+};
+const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+const S = {}; // وضعیت مشترک بین آزمون‌ها
+
+// سرورهای ساختگی: بالادست نقشه و API سازگار با تلگرام/بله (اینترنت بیرونی در آزمون نیست)
+const http = require('node:http');
+const PNG_BUF = Buffer.from(PNG.split(',')[1], 'base64');
+let tileSrv, botSrv, tileHits = 0; const botCalls = []; let tilePort, botPort;
+const listen = (srv) => new Promise((r) => srv.listen(0, '127.0.0.1', () => r(srv.address().port)));
+
+before(async () => {
+  tileSrv = http.createServer((req, res) => { tileHits++; res.writeHead(200, { 'content-type': 'image/png' }); res.end(PNG_BUF); });
+  botSrv = http.createServer((req, res) => { let b = ''; req.on('data', (c) => { b += c; }); req.on('end', () => { botCalls.push({ url: req.url, body: b }); res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify({ ok: true, result: {} })); }); });
+  tilePort = await listen(tileSrv); botPort = await listen(botSrv);
+  proc = spawn(process.execPath, ['--no-warnings', path.join(__dirname, '..', 'index.js')], { env: { ...process.env, PORT, DAL_DATA_DIR: dir, DAL_DB: path.join(dir, 't.db'), DAL_TILE_LIGHT: `http://127.0.0.1:${tilePort}/{z}/{x}/{y}.png`, DAL_BALE_API: `http://127.0.0.1:${botPort}`, DAL_BALE_TOKEN: '111:TESTTOKEN', DAL_BALE_CHAT: '555' }, stdio: 'ignore' });
+  for (let i = 0; i < 100; i++) { try { await fetch(base + '/health'); return; } catch { await new Promise((r) => setTimeout(r, 200)); } }
+  throw new Error('server did not start');
+});
+after(() => { proc && proc.kill(); tileSrv && tileSrv.close(); botSrv && botSrv.close(); fs.rmSync(dir, { recursive: true, force: true }); });
+
+const listingBody = (o = {}) => ({ title: 'آپارتمان ۱۰۰ متری نوساز در سعادت‌آباد', deal: 'sale', ptype: 'apartment', city: 'tehran', district: 'saadat-abad', area: 100, price: 9e9, rooms: 2, baths: 1, year_built: 1400, floor: 3, floors_total: 5, features: ['parking', 'elevator'], images: [S.img], description: 'توضیحات تست', ...o });
+
+test('پایگاه‌داده خالی است و راه‌اندازی لازم است', async () => {
+  assert.strictEqual((await call('/setup/status')).data.needsSetup, true);
+  const l = await call('/listings'); assert.strictEqual(l.data.total, 0);
+  const st = await call('/stats/home'); assert.strictEqual(st.data.listings, 0); assert.strictEqual(st.data.agents, 0);
+  assert.strictEqual((await call('/articles')).data.items.length, 0);
+  assert.strictEqual((await call('/requests')).data.items.length, 0);
+});
+
+test('ساخت مدیر فقط با کد راه‌اندازی', async () => {
+  const bad = await call('/setup', { body: { token: 'nope', name: 'مدیر تست', phone: '09120000001', password: 'Admin12345' } }); assert.strictEqual(bad.status, 403);
+  const tok = fs.readFileSync(path.join(dir, '.setup-token'), 'utf8').trim();
+  const weak = await call('/setup', { body: { token: tok, name: 'مدیر تست', phone: '09120000001', password: 'abc' } }); assert.strictEqual(weak.status, 400);
+  const ok = await call('/setup', { body: { token: tok, name: 'مدیر تست', phone: '09120000001', password: 'Admin12345' } });
+  assert.strictEqual(ok.status, 200); assert.strictEqual(ok.data.user.role, 'admin'); assert.match(ok.data.recovery, /^[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/);
+  S.admin = ok.data.token; S.adminRecovery = ok.data.recovery;
+  assert.strictEqual((await call('/setup/status')).data.needsSetup, false);
+  assert.strictEqual((await call('/setup', { body: { token: tok, name: 'x', phone: '09120000002', password: 'Admin12345' } })).status, 403);
+});
+
+test('ثبت‌نام، ورود و اعتبارسنجی', async () => {
+  assert.strictEqual((await call('/auth/register', { body: { name: 'علی رضایی', phone: '123', password: 'User12345' } })).status, 400);
+  assert.strictEqual((await call('/auth/register', { body: { name: 'علی رضایی', phone: '09121111111', password: '12345678' } })).status, 400, 'رمز بدون حرف');
+  const u = await call('/auth/register', { body: { name: 'علی رضایی', phone: '۰۹۱۲۱۱۱۱۱۱۱', password: 'User12345' } });
+  assert.strictEqual(u.status, 200); S.user = u.data.token; S.userId = u.data.user.id; S.userRecovery = u.data.recovery;
+  assert.strictEqual((await call('/auth/register', { body: { name: 'علی رضایی', phone: '09121111111', password: 'User12345' } })).status, 409);
+  assert.strictEqual((await call('/auth/register', { body: { name: 'مشاور تست', phone: '09122222222', password: 'Agent12345', role: 'agent' } })).status, 400, 'مشاور بدون پروانه');
+  const a = await call('/auth/register', { body: { name: 'مشاور تست', phone: '09122222222', password: 'Agent12345', role: 'agent', license_no: '1402/555', agency: 'املاک تست', city: 'tehran' } });
+  assert.strictEqual(a.status, 200); S.agent = a.data.token; S.agentId = a.data.user.id;
+  const b = await call('/auth/register', { body: { name: 'خریدار دوم', phone: '09123333333', password: 'Buyer12345' } }); S.user2 = b.data.token;
+  assert.strictEqual((await call('/auth/login', { body: { phone: '09121111111', password: 'bad' } })).status, 401);
+  const l = await call('/auth/login', { body: { phone: '09121111111', password: 'User12345' } }); assert.ok(l.data.token);
+  assert.strictEqual((await call('/me', { token: S.user })).data.user.name, 'علی رضایی');
+  assert.strictEqual((await call('/me')).status, 401);
+});
+
+test('بازیابی رمز با کد بازیابی و ابطال توکن‌های قبلی', async () => {
+  const bad = await call('/auth/reset', { body: { phone: '09121111111', code: 'AAAA-BBBB-CCCC', password: 'NewPass123' } }); assert.strictEqual(bad.status, 400);
+  const r = await call('/auth/reset', { body: { phone: '09121111111', code: S.userRecovery.toLowerCase(), password: 'NewPass123' } });
+  assert.strictEqual(r.status, 200); assert.notStrictEqual(r.data.recovery, S.userRecovery);
+  assert.strictEqual((await call('/me', { token: S.user })).status, 401, 'توکن قدیمی باید باطل شود');
+  assert.strictEqual((await call('/auth/reset', { body: { phone: '09121111111', code: S.userRecovery, password: 'Other12345' } })).status, 400, 'کد مصرف‌شده');
+  assert.ok((await call('/auth/login', { body: { phone: '09121111111', password: 'NewPass123' } })).data.token);
+  S.user = r.data.token; S.userRecovery = r.data.recovery;
+});
+
+test('تغییر رمز، پروفایل و کد بازیابی جدید', async () => {
+  assert.strictEqual((await call('/me/password', { method: 'PUT', token: S.user, body: { old: 'wrong', password: 'Another123' } })).status, 400);
+  const ch = await call('/me/password', { method: 'PUT', token: S.user, body: { old: 'NewPass123', password: 'Another123' } }); assert.strictEqual(ch.status, 200); S.user = ch.data.token;
+  const p = await call('/me', { method: 'PUT', token: S.user, body: { name: 'علی رضایی‌نژاد', email: 'ali@example.com' } }); assert.strictEqual(p.data.user.email, 'ali@example.com');
+  assert.strictEqual((await call('/me', { method: 'PUT', token: S.user, body: { email: 'bad' } })).status, 400);
+  const rc = await call('/me/recovery', { token: S.user, body: { password: 'Another123' } }); assert.ok(rc.data.recovery); S.userRecovery = rc.data.recovery;
+});
+
+test('ثبت آگهی: تصویر الزامی و صف تأیید', async () => {
+  const up = await call('/upload', { token: S.user, body: { data: PNG } }); assert.strictEqual(up.status, 200); S.img = up.data.url;
+  assert.strictEqual((await call('/upload', { token: S.user, body: { data: 'data:image/png;base64,AAAA' } })).status, 400, 'امضای نادرست');
+  assert.strictEqual((await call('/upload', { body: { data: PNG } })).status, 401);
+  const img = await fetch(`http://127.0.0.1:${PORT}${S.img}`); assert.strictEqual(img.status, 200);
+  assert.strictEqual((await call('/listings', { token: S.user, body: listingBody({ images: [] }) })).status, 400, 'بدون تصویر');
+  assert.strictEqual((await call('/listings', { token: S.user, body: listingBody({ price: 0 }) })).status, 400);
+  const c = await call('/listings', { token: S.user, body: listingBody() }); assert.strictEqual(c.status, 200); assert.strictEqual(c.data.status, 'pending'); S.l1 = c.data.id;
+  assert.strictEqual((await call('/listings')).data.total, 0, 'آگهی در انتظار عمومی نیست');
+  assert.strictEqual((await call('/listings/' + S.l1)).status, 404);
+  assert.strictEqual((await call('/listings/' + S.l1, { token: S.user })).data.canEdit, true);
+  assert.ok((await call('/notifications', { token: S.admin })).data.items.some((n) => n.title.includes('در انتظار')), 'مدیر باید خبردار شود');
+});
+
+test('مدیر: رد و تأیید آگهی، ویرایش دوباره‌ی آگهی ردشده', async () => {
+  assert.strictEqual((await call('/admin/listings/' + S.l1, { method: 'PUT', token: S.user, body: { status: 'active' } })).status, 403);
+  await call('/admin/listings/' + S.l1, { method: 'PUT', token: S.admin, body: { status: 'rejected', reject_reason: 'تصویر نامناسب' } });
+  assert.strictEqual((await call('/my/listings', { token: S.user })).data.items[0].reject_reason, 'تصویر نامناسب');
+  const e = await call('/listings/' + S.l1, { method: 'PUT', token: S.user, body: { description: 'ویرایش‌شده' } }); assert.strictEqual(e.data.status, 'pending');
+  await call('/admin/listings/' + S.l1, { method: 'PUT', token: S.admin, body: { status: 'active', verified: true } });
+  const l = await call('/listings'); assert.strictEqual(l.data.total, 1);
+  assert.strictEqual(l.data.items[0].verified, true);
+});
+
+test('مشاور تأییدنشده و تأییدشده', async () => {
+  const c = await call('/listings', { token: S.agent, body: listingBody({ title: 'ویلای ۳۰۰ متری در نیاوران', ptype: 'villa', district: 'niavaran', area: 300, price: 4e10 }) }); assert.strictEqual(c.data.status, 'pending'); S.l2 = c.data.id;
+  await call('/admin/users/' + S.agentId, { method: 'PUT', token: S.admin, body: { verified: true } });
+  const d = await call('/listings', { token: S.agent, body: listingBody({ title: 'آپارتمان اجاره‌ای در ونک', deal: 'rent', price: 5e8, rent: 2e7, area: 80, district: 'vanak' }) }); assert.strictEqual(d.data.status, 'active'); S.l3 = d.data.id;
+  const e = await call('/listings/' + S.l3, { method: 'PUT', token: S.agent, body: { rent: 1.8e7 } }); assert.strictEqual(e.data.status, 'active');
+  const det = await call('/listings/' + S.l3); assert.strictEqual(det.data.history.length, 2, 'تاریخچه‌ی قیمت');
+  await call('/admin/listings/' + S.l2, { method: 'PUT', token: S.admin, body: { status: 'active' } });
+});
+
+test('جستجو، فیلتر، مرتب‌سازی و جستجوی هوشمند', async () => {
+  assert.strictEqual((await call('/listings?deal=rent')).data.total, 1);
+  assert.strictEqual((await call('/listings?ptype=villa')).data.total, 1);
+  assert.strictEqual((await call('/listings?minPrice=10000000000&deal=sale')).data.total, 1);
+  assert.strictEqual((await call('/listings?district=vanak')).data.total, 1);
+  assert.strictEqual((await call('/listings?q=ونک')).data.total, 1);
+  const s = await call('/listings?deal=sale&sort=price_asc'); const p = s.data.items.map((i) => i.price); assert.deepStrictEqual(p, [...p].sort((a, b) => a - b));
+  const sm = await call('/smart-search', { body: { q: 'ویلا در نیاوران' } }); assert.strictEqual(sm.data.filters.ptype, 'villa'); assert.strictEqual(sm.data.count, 1);
+  assert.strictEqual((await call('/listings/map?deal=sale')).data.items.length, 2);
+  assert.strictEqual((await call('/listings/compare?ids=' + S.l1 + ',' + S.l3)).data.items.length, 2);
+});
+
+test('علاقه‌مندی، جستجوی ذخیره‌شده و اعلان آگهی تازه', async () => {
+  assert.strictEqual((await call('/favorites/' + S.l3, { token: S.user2, body: {} })).data.fav, true);
+  assert.strictEqual((await call('/favorites', { token: S.user2 })).data.items.length, 1);
+  assert.strictEqual((await call('/favorites/' + S.l3, { token: S.user2, body: {} })).data.fav, false);
+  assert.strictEqual((await call('/saved-searches', { token: S.user2, body: { name: 'ویلا', query: {} } })).status, 400);
+  const ss = await call('/saved-searches', { token: S.user2, body: { name: 'آپارتمان نیاوران', query: { ptype: 'apartment', district: 'niavaran' } } }); assert.ok(ss.data.id);
+  await call('/favorites/' + S.l1, { token: S.user2, body: {} });
+  const n = await call('/listings', { token: S.agent, body: listingBody({ title: 'آپارتمان لوکس در نیاوران', district: 'niavaran', price: 2e10 }) }); assert.strictEqual(n.status, 200);
+  assert.ok((await call('/notifications', { token: S.user2 })).data.items.some((x) => x.title.includes('آپارتمان نیاوران')), 'اعلان جستجوی ذخیره‌شده');
+  const price = await call('/listings/' + S.l1, { method: 'PUT', token: S.user, body: { price: 8e9 } }); assert.strictEqual(price.status, 200);
+  assert.ok((await call('/notifications', { token: S.user2 })).data.items.some((x) => x.title.includes('کاهش قیمت')), 'اعلان کاهش قیمت');
+  const list = await call('/saved-searches', { token: S.user2 }); assert.strictEqual(list.data.items[0].count, 1);
+  assert.strictEqual((await call('/saved-searches/' + ss.data.id, { method: 'DELETE', token: S.user2 })).status, 200);
+});
+
+test('درخواست مشاوره، چت و بازدید', async () => {
+  assert.strictEqual((await call(`/listings/${S.l3}/inquiries`, { body: { name: 'م', phone: '1', message: 'x' } })).status, 400);
+  assert.strictEqual((await call(`/listings/${S.l3}/inquiries`, { body: { name: 'مهمان', phone: '09124444444', message: 'آیا هنوز موجود است؟' } })).status, 200);
+  const inb = await call('/inquiries', { token: S.agent }); assert.strictEqual(inb.data.items.length, 1);
+  assert.strictEqual((await call('/inquiries/' + inb.data.items[0].id, { method: 'PUT', token: S.agent, body: { status: 'contacted' } })).status, 200);
+  assert.strictEqual((await call('/threads', { token: S.agent, body: { listing_id: S.l3, body: 'سلام' } })).status, 400, 'پیام به آگهی خود');
+  const t = await call('/threads', { token: S.user2, body: { listing_id: S.l3, body: 'سلام، وقت دارید؟' } }); assert.ok(t.data.id);
+  assert.strictEqual((await call(`/threads/${t.data.id}/messages`, { token: S.agent, body: { body: 'بله، بفرمایید' } })).status, 200);
+  assert.strictEqual((await call('/threads/' + t.data.id, { token: S.user })).status, 404, 'غریبه نباید ببیند');
+  const th = await call('/threads/' + t.data.id, { token: S.user2 }); assert.strictEqual(th.data.messages.length, 2);
+  assert.strictEqual((await call('/threads', { token: S.agent })).data.items[0].unread, 1);
+  await call('/threads/' + t.data.id, { token: S.agent });
+  assert.strictEqual((await call('/threads', { token: S.agent })).data.items[0].unread, 0, 'پس از خواندن');
+  const d = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
+  assert.strictEqual((await call(`/listings/${S.l3}/slots?date=${d}`)).data.slots.length, 10);
+  const ap = await call(`/listings/${S.l3}/appointments`, { token: S.user2, body: { date: d, time: '10:00', note: 'همراه همسرم' } }); assert.ok(ap.data.id);
+  assert.strictEqual((await call(`/listings/${S.l3}/appointments`, { token: S.user, body: { date: d, time: '10:00' } })).status, 409, 'ساعت رزرو شده');
+  assert.strictEqual((await call(`/listings/${S.l3}/slots?date=${d}`)).data.slots.find((x) => x.time === '10:00').free, false);
+  assert.strictEqual((await call('/appointments/' + ap.data.id, { method: 'PUT', token: S.agent, body: { status: 'confirmed' } })).status, 200);
+  assert.strictEqual((await call('/appointments/' + ap.data.id, { method: 'PUT', token: S.user2, body: { status: 'done' } })).status, 403);
+  assert.strictEqual((await call('/appointments', { token: S.user2 })).data.mine[0].status, 'confirmed');
+});
+
+test('نظر درباره‌ی مشاور فقط پس از ارتباط واقعی', async () => {
+  assert.strictEqual((await call(`/agents/${S.agentId}/reviews`, { token: S.user, body: { rating: 5, comment: 'عالی' } })).status, 403);
+  assert.strictEqual((await call(`/agents/${S.agentId}/reviews`, { token: S.user2, body: { rating: 4, comment: 'خوب' } })).status, 200);
+  const ag = await call('/agents/' + S.agentId); assert.strictEqual(ag.data.agent.rating, 4); assert.strictEqual(ag.data.reviews.length, 1); assert.ok(ag.data.total >= 2);
+  assert.strictEqual((await call('/agents')).data.items.length, 1);
+});
+
+test('تابلوی درخواست و پاسخ مشاور', async () => {
+  const r = await call('/requests', { token: S.user, body: { title: 'دنبال آپارتمان ۲ خوابه در ونک', deal: 'rent', city: 'tehran', district: 'vanak', rent_max: 3e7 } }); assert.ok(r.data.id);
+  assert.strictEqual((await call('/requests')).data.items[0].mine, false);
+  assert.strictEqual((await call(`/requests/${r.data.id}/respond`, { token: S.user2, body: { message: 'x' } })).status, 403);
+  assert.strictEqual((await call(`/requests/${r.data.id}/respond`, { token: S.agent, body: { listing_id: S.l3, message: 'این گزینه مناسب است' } })).status, 200);
+  assert.ok((await call('/notifications', { token: S.user })).data.items.some((n) => n.title.includes('پاسخ داد')));
+  assert.strictEqual((await call('/requests/' + r.data.id, { method: 'DELETE', token: S.user2 })).status, 404);
+  assert.strictEqual((await call('/requests/' + r.data.id, { method: 'DELETE', token: S.user })).status, 200);
+});
+
+test('گزارش تخلف و رسیدگی مدیر', async () => {
+  assert.strictEqual((await call(`/listings/${S.l3}/report`, { body: { reason: '' } })).status, 400);
+  assert.strictEqual((await call(`/listings/${S.l3}/report`, { token: S.user, body: { reason: 'کلاهبرداری', details: 'شماره‌ی تماس اشتباه است' } })).status, 200);
+  const rp = await call('/admin/reports', { token: S.admin }); assert.strictEqual(rp.data.items.length, 1);
+  assert.strictEqual((await call('/admin/reports', { token: S.user })).status, 403);
+  assert.strictEqual((await call('/admin/reports/' + rp.data.items[0].id, { method: 'PUT', token: S.admin, body: { status: 'resolved' } })).status, 200);
+});
+
+test('وضعیت آگهی، تمدید و حذف', async () => {
+  assert.strictEqual((await call(`/listings/${S.l3}/status`, { method: 'PUT', token: S.user, body: { status: 'rented' } })).status, 403);
+  assert.strictEqual((await call(`/listings/${S.l3}/status`, { method: 'PUT', token: S.agent, body: { status: 'rented' } })).status, 200);
+  assert.strictEqual((await call('/listings?deal=rent')).data.total, 0);
+  assert.strictEqual((await call(`/listings/${S.l3}/status`, { method: 'PUT', token: S.agent, body: { status: 'active' } })).data.status, 'active');
+  assert.strictEqual((await call(`/listings/${S.l3}/renew`, { token: S.agent, body: {} })).data.status, 'active');
+  const dash = await call('/dashboard', { token: S.agent }); assert.ok(dash.data.listings.total >= 3);
+  const csv = await call('/my/listings.csv', { token: S.agent }); assert.ok(String(csv.data).includes('آپارتمان'));
+  assert.strictEqual((await call('/listings/' + S.l1, { method: 'DELETE', token: S.user2 })).status, 403);
+  assert.strictEqual((await call('/listings/' + S.l1, { method: 'DELETE', token: S.user })).status, 200);
+  assert.strictEqual((await call('/listings/' + S.l1)).status, 404);
+});
+
+test('تحلیل بازار و برآورد قیمت از داده‌ی واقعی', async () => {
+  const m = await call('/analytics/market?city=tehran');
+  const van = m.data.districts.find((d) => d.slug === 'vanak'); assert.strictEqual(van.growth12, null, 'بدون تاریخچه رشد نداریم');
+  const nia = m.data.districts.find((d) => d.slug === 'niavaran'); assert.ok(nia.samples >= 1 && nia.source !== 'reference');
+  assert.ok(m.data.cityTrend.length >= 1);
+  const v = await call('/valuate', { body: { city: 'tehran', district: 'niavaran', ptype: 'apartment', area: 100, rooms: 2 } });
+  assert.ok(v.data.low < v.data.price && v.data.price < v.data.high); assert.ok(['blended', 'market'].includes(v.data.basis));
+  const v2 = await call('/valuate', { body: { city: 'tehran', district: 'zaferanieh', ptype: 'apartment', area: 100 } }); assert.strictEqual(v2.data.basis, 'reference');
+});
+
+test('تمرکز ویژه: کنگان و شیراز، شماره‌های مشاوره، درخواست مشاوره', async () => {
+  const meta = (await call('/meta')).data;
+  assert.deepStrictEqual(meta.cities.slice(0, 2).map((c) => c.slug), ['kangan', 'shiraz']);
+  assert.deepStrictEqual(meta.site.phones, ['09206696092', '09202290930']);
+  assert.ok(meta.cities[0].districts.length >= 30);
+  // محله‌ی کنگان قیمت مرجع ندارد؛ بدون داده برآورد ساخته نمی‌شود (نه عدد ساختگی)
+  assert.strictEqual((await call('/valuate', { body: { city: 'kangan', district: 'shahrak-yas', area: 100 } })).status, 422);
+  const m = (await call('/analytics/market?city=kangan')).data; assert.ok(m.districts.every((d) => d.ppm === null && d.source === 'none'));
+  assert.strictEqual((await call('/consult', { body: { name: 'الف', phone: '123', city: 'kangan' } })).status, 400);
+  assert.strictEqual((await call('/consult', { body: { name: 'خریدار کنگان', phone: '09125550000', city: 'kangan', kind: 'buy', note: 'آپارتمان ۲ خوابه' } })).status, 200);
+  const cs = (await call('/admin/contacts', { token: S.admin })).data.items; const c = cs.find((x) => x.contact === '09125550000');
+  assert.ok(c && c.city === 'kangan' && c.kind === 'buy');
+  assert.strictEqual((await call('/admin/site', { token: S.user2 })).status, 403);
+  assert.strictEqual((await call('/admin/site', { method: 'PUT', token: S.admin, body: { phones: 'abc' } })).status, 400);
+  const sv = await call('/admin/site', { method: 'PUT', token: S.admin, body: { phones: '09206696092\n09202290930', telegram: '@dal_support' } });
+  assert.strictEqual(sv.data.site.telegram, 'dal_support');
+  assert.strictEqual((await call('/geocode?q=ab')).data.items.length, 0);
+  const id = (await call('/listings?limit=1')).data.items[0]?.id;
+  const root = base.replace(/\/api$/, ''); const cid = c.id;
+  assert.strictEqual((await call('/admin/contacts/' + cid, { method: 'PUT', token: S.admin, body: { status: 'contacted', admin_note: 'ساعت ۵ تماس گرفته شد' } })).status, 200);
+  const fl = (await call('/admin/contacts?status=contacted', { token: S.admin })).data; assert.ok(fl.items.some((x) => x.id === cid && x.admin_note.includes('تماس')) && fl.counts.contacted >= 1);
+  assert.strictEqual((await call('/admin/contacts?status=done', { token: S.admin })).data.items.some((x) => x.id === cid), false);
+  const csv = await fetch(root + '/api/admin/contacts.csv', { headers: { authorization: 'Bearer ' + S.admin } }); assert.ok((await csv.text()).includes('09125550000'));
+  if (id) { const pg = await (await fetch(root + '/l/' + id)).text(); assert.ok(pg.includes('og:title') && pg.includes('#/listing/' + id)); }
+  const sm = await (await fetch(root + '/sitemap.xml')).text(); assert.ok(sm.includes('<urlset'));
+  assert.ok((await (await fetch(root + '/robots.txt')).text()).includes('Sitemap:'));
+  const nl = await call('/smart-search', { body: { q: 'آپارتمان در شهرک یاس کنگان' } });
+  assert.strictEqual(nl.data.filters.city, 'kangan'); assert.strictEqual(nl.data.filters.district, 'shahrak-yas');
+});
+
+test('مدیر همکار می‌سازد و آگهی همکار مستقیم منتشر می‌شود؛ مجله به‌طور پیش‌فرض خالی است', async () => {
+  assert.strictEqual((await call('/articles')).data.items.length, 0, 'مقاله‌ی ساختگی نداریم');
+  assert.strictEqual((await call('/admin/users', { token: S.user2, body: { name: 'همکار', phone: '09127770000' } })).status, 403);
+  assert.strictEqual((await call('/admin/users', { token: S.admin, body: { name: 'همکار', phone: '123' } })).status, 400);
+  const mk = await call('/admin/users', { token: S.admin, body: { name: 'همکار کنگان', phone: '09127770000', role: 'agent', agency: 'دفتر کنگان' } });
+  assert.strictEqual(mk.status, 200); assert.ok(mk.data.temp_password && mk.data.recovery);
+  assert.strictEqual((await call('/admin/users', { token: S.admin, body: { name: 'همکار کنگان', phone: '09127770000' } })).status, 409);
+  const lg = await call('/auth/login', { body: { phone: '09127770000', password: mk.data.temp_password } }); assert.ok(lg.data.token);
+  const l = await call('/listings', { token: lg.data.token, body: listingBody({ city: 'kangan', district: 'shahrak-yas', title: 'آپارتمان همکار در شهرک یاس' }) });
+  assert.strictEqual(l.status, 200); assert.strictEqual(l.data.status, 'active');
+});
+
+test('مدیریت: کاربران، بازنشانی رمز، مقاله و دسترسی‌ها', async () => {
+  assert.strictEqual((await call('/admin/stats', { token: S.user2 })).status, 403);
+  const st = await call('/admin/stats', { token: S.admin }); assert.ok(st.data.users >= 4);
+  assert.strictEqual((await call('/admin/users?q=تست', { token: S.admin })).data.items.length >= 2, true);
+  const rs = await call('/admin/users/' + S.agentId, { method: 'PUT', token: S.admin, body: { reset_password: true } }); assert.ok(rs.data.temp_password);
+  assert.strictEqual((await call('/me', { token: S.agent })).status, 401);
+  assert.ok((await call('/auth/login', { body: { phone: '09122222222', password: rs.data.temp_password } })).data.token);
+  const art = await call('/admin/articles', { token: S.admin, body: { title: 'مقاله‌ی آزمایشی من', category: 'اخبار', body: '## تیتر\nمتن کافی برای آزمایش مقاله‌ی جدید در مجله‌ی دال که از سی نویسه بیشتر است.' } }); assert.ok(art.data.slug);
+  assert.strictEqual((await call('/articles/' + art.data.slug)).data.article.title, 'مقاله‌ی آزمایشی من');
+  assert.strictEqual((await call('/admin/articles/' + art.data.id, { method: 'DELETE', token: S.admin })).status, 200);
+  assert.strictEqual((await call('/admin/users/' + S.userId, { method: 'PUT', token: S.admin, body: { banned: true } })).status, 200);
+  assert.strictEqual((await call('/me', { token: S.user })).status, 401); assert.strictEqual((await call('/auth/login', { body: { phone: '09121111111', password: 'Another123' } })).status, 403);
+  assert.strictEqual((await call('/me', { method: 'DELETE', token: S.admin, body: { password: 'Admin12345' } })).status, 400, 'آخرین مدیر');
+});
+
+test('حذف حساب', async () => {
+  assert.strictEqual((await call('/me', { method: 'DELETE', token: S.user2, body: { password: 'bad' } })).status, 400);
+  assert.strictEqual((await call('/me', { method: 'DELETE', token: S.user2, body: { password: 'Buyer12345' } })).status, 200);
+  assert.strictEqual((await call('/auth/login', { body: { phone: '09123333333', password: 'Buyer12345' } })).status, 401);
+});
+
+test('پروکسی کاشی‌ها: کش دیسکی، سرو بدون بالادست و رد مختصات نامعتبر', async () => {
+  const root = base.replace(/\/api$/, '');
+  const r1 = await fetch(root + '/tiles/light/5/16/12.png'); assert.strictEqual(r1.status, 200); assert.strictEqual(r1.headers.get('content-type'), 'image/png');
+  assert.strictEqual(Buffer.from(await r1.arrayBuffer()).length, PNG_BUF.length);
+  const hits = tileHits; assert.ok(hits >= 1);
+  const r2 = await fetch(root + '/tiles/light/5/16/12.png'); assert.strictEqual(r2.status, 200); assert.strictEqual(tileHits, hits, 'بار دوم باید از کش بیاید');
+  tileSrv.close(); await new Promise((r) => setTimeout(r, 50));
+  assert.strictEqual((await fetch(root + '/tiles/light/5/16/12.png')).status, 200, 'بدون بالادست از کش');
+  assert.strictEqual((await fetch(root + '/tiles/light/5/16/13.png')).status, 404, 'کاشی کش‌نشده و بالادست قطع');
+  assert.strictEqual((await fetch(root + '/tiles/light/3/99/1.png')).status, 404, 'x خارج از محدوده');
+  assert.strictEqual((await fetch(root + '/tiles/light/30/1/1.png')).status, 404, 'z نامعتبر');
+  assert.strictEqual((await fetch(root + '/tiles/evil/1/1/1.png')).status, 404);
+});
+
+test('هشدار مدیر به بله (API سازگار با تلگرام)', async () => {
+  const nu = await call('/auth/register', { body: { name: 'کاربر عادی', phone: '09124444444', password: 'Normal12345', role: 'user' } }); S.plain = nu.data.token; assert.ok(S.plain);
+  assert.strictEqual((await call('/admin/notify/test', { token: S.plain, body: {} })).status, 403);
+  const r = await call('/admin/notify/test', { token: S.admin, body: {} });
+  assert.strictEqual(r.status, 200); assert.strictEqual(r.data.ok, true); assert.strictEqual(r.data.results.bale.ok, true);
+  const c = botCalls.find((x) => x.url.startsWith('/bot111:TESTTOKEN/sendMessage')); assert.ok(c, 'درخواست به بله رسید');
+  assert.strictEqual(JSON.parse(c.body).chat_id, '555');
+  const site = await call('/admin/site', { token: S.admin }); assert.strictEqual(site.data.bale.configured, true); assert.ok(!JSON.stringify(site.data).includes('TESTTOKEN'), 'توکن نباید فاش شود');
+});
+
+test('پشتیبان محلی و عیب‌یابی اتصال', async () => {
+  assert.strictEqual((await call('/admin/backup', { method: 'POST', token: S.plain, body: {} })).status, 403);
+  const b = await call('/admin/backup', { method: 'POST', token: S.admin, body: {} }); assert.strictEqual(b.status, 200);
+  assert.ok(fs.readdirSync(path.join(dir, 'backups')).some((f) => /^dal-\d{4}-\d{2}-\d{2}\.db$/.test(f)), 'فایل پشتیبان ساخته شد');
+  const d = await call('/admin/diagnostics', { token: S.admin }); assert.strictEqual(d.status, 200);
+  assert.ok(Array.isArray(d.data.checks) && d.data.checks.length === 4);
+});
+
+test('فشرده‌سازی بروتلی فایل‌های ایستا', async () => {
+  const r = await fetch(base.replace(/\/api$/, '') + '/js/core.js', { headers: { 'accept-encoding': 'br' } });
+  assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-encoding'), 'br');
+});

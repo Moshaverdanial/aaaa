@@ -1,0 +1,5 @@
+# HTTPS خودکار و رایگان (Let's Encrypt) وقتی DOMAIN یک دامنه باشد
+{$DOMAIN::80} {
+	encode zstd gzip
+	reverse_proxy dal:3000
+}

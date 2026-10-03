@@ -1,0 +1,20 @@
+{
+  "name": "dal-real-estate",
+  "version": "1.0.0",
+  "description": "دال — پلتفرم جامع املاک آنلاین (بدون وابستگی خارجی؛ Node 22+)",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node --no-warnings server/index.js",
+    "admin": "node --no-warnings server/cli.js admin",
+    "reset-password": "node --no-warnings server/cli.js reset-password",
+    "backup": "node --no-warnings server/cli.js backup",
+    "stats": "node --no-warnings server/cli.js stats",
+    "bundle": "node scripts/bundle.js",
+    "seed:demo": "node --no-warnings server/seed.js --force",
+    "test": "node --no-warnings --test server/tests/api.test.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "license": "MIT"
+}

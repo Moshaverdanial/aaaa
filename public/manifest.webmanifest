@@ -1,0 +1,12 @@
+{
+  "name": "دال — املاک آنلاین",
+  "short_name": "دال",
+  "description": "هوشمندترین پلتفرم املاک ایران",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6fb",
+  "theme_color": "#5b3df5",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

@@ -1,0 +1,29 @@
+# اجرا:  DOMAIN=example.com docker compose up -d
+# بدون دامنه:  docker compose up -d   (سایت روی http://IP  سرو می‌شود)
+services:
+  dal:
+    build: .
+    restart: unless-stopped
+    environment:
+      DAL_TG_TOKEN: ${DAL_TG_TOKEN:-}
+      DAL_TG_CHAT: ${DAL_TG_CHAT:-}
+      DAL_BALE_TOKEN: ${DAL_BALE_TOKEN:-}
+      DAL_BALE_CHAT: ${DAL_BALE_CHAT:-}
+      DAL_TG_API: ${DAL_TG_API:-}
+    volumes:
+      - dal-data:/data
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on: [dal]
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN:-:80}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+volumes:
+  dal-data:
+  caddy-data:
+  caddy-config:
