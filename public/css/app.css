@@ -432,7 +432,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shado
 .footer::before { content: ''; position: absolute; inset: 0; opacity: .07; pointer-events: none; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><g fill='none' stroke='%23e6c76f' stroke-width='1.2'><rect x='18' y='18' width='36' height='36'/><rect x='18' y='18' width='36' height='36' transform='rotate(45 36 36)'/><circle cx='36' cy='36' r='6'/></g></svg>"); }
 .footer > * { position: relative; }
 .footer h5 { color: var(--gold-2); }
-.cta { position: relative; overflow: hidden; background: linear-gradient(110deg, rgba(6, 10, 30, .92), rgba(14, 28, 80, .72)), url(/img/hero-night.jpg) center / cover; border: 1px solid rgba(230, 199, 111, .5); box-shadow: 0 30px 70px -28px rgba(0, 0, 0, .65); }
+.cta { position: relative; overflow: hidden; background: linear-gradient(110deg, rgba(6, 10, 30, .92), rgba(14, 28, 80, .72)), url(/img/hero-simorgh.jpg) center / cover; border: 1px solid rgba(230, 199, 111, .5); box-shadow: 0 30px 70px -28px rgba(0, 0, 0, .65); }
 .focus-card { box-shadow: 0 18px 44px -20px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(230, 199, 111, .4); }
 .divider-gold { height: 1px; border: 0; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 24px 0; }
 ::selection { background: rgba(201, 162, 75, .45); }
@@ -444,7 +444,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shado
 /* تنظیم نهایی لوکس */
 :root { --veil: linear-gradient(180deg, rgba(250, 246, 236, .74), rgba(244, 238, 224, .86)); }
 [data-theme='dark'] { --veil: linear-gradient(180deg, rgba(5, 8, 24, .42), rgba(5, 8, 24, .66)); }
-.consult-hero { background: linear-gradient(120deg, rgba(5, 40, 40, .92), rgba(10, 80, 76, .78) 55%, rgba(20, 40, 110, .75)), url(/img/hero-battle.jpg) center / cover; border: 1px solid rgba(230, 199, 111, .5); box-shadow: 0 30px 70px -28px rgba(0, 0, 0, .6); }
+.consult-hero { background: linear-gradient(120deg, rgba(5, 40, 40, .92), rgba(10, 80, 76, .78) 55%, rgba(20, 40, 110, .75)), url(/img/hero-day.jpg) center / cover; border: 1px solid rgba(230, 199, 111, .5); box-shadow: 0 30px 70px -28px rgba(0, 0, 0, .6); }
 .consult-hero .btn.primary { background: var(--gold-grad); color: #2a1c00; box-shadow: 0 8px 22px rgba(168, 120, 31, .4), inset 0 1px 0 rgba(255, 255, 255, .5); }
 .focus-card.k { background: linear-gradient(135deg, #072f33, #0d5b5a 55%, #17897f); } .focus-card.s { background: linear-gradient(135deg, #101a4d, #1f3a8a 55%, #3c5aa8); }
 .fab-consult { background: var(--gold-grad); color: #2a1c00; box-shadow: 0 12px 28px -8px rgba(168, 120, 31, .65), inset 0 1px 0 rgba(255, 255, 255, .5); }
