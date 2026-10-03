@@ -204,7 +204,9 @@
       <a class="share-item" target="_blank" rel="noopener" href="https://wa.me/?text=${enc(title + ' ' + url)}">واتس‌اپ</a>
       <a class="share-item" href="sms:?body=${enc(title + ' ' + url)}">پیامک</a>
       <a class="share-item" href="mailto:?subject=${enc(title)}&body=${enc(url)}">ایمیل</a></div>
-      <div class="copy-row"><input readonly value="${url}" dir="ltr"><button class="btn primary" id="cp">${icon('copy', 16)} کپی</button></div>`, { title: 'اشتراک‌گذاری' });
+      <div class="copy-row"><input readonly value="${url}" dir="ltr"><button class="btn primary" id="cp">${icon('copy', 16)} کپی</button></div>
+      <button class="btn ghost block mt" id="qrb">${icon('crosshair', 16)} نمایش QR (برای پوستر و چاپ)</button>`, { title: 'اشتراک‌گذاری' });
+    $('#qrb', m.body).onclick = () => { m.close(); Dal.showQr(url, title); };
     $('#cp', m.body).onclick = async () => { try { await navigator.clipboard.writeText(url); Dal.toast('پیوند کپی شد.', 'success'); } catch { $('input', m.body).select(); } };
   };
 

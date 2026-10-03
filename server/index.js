@@ -882,6 +882,7 @@ put('/api/admin/reports/:id', ADMIN, (ctx) => { q.run('UPDATE reports SET status
 
 // ------------------------------------------------------------------ server
 // دفترچه‌ی دال (کمدها، ثبت‌ها و پیشنهاد هوشمند)
+require('./team').install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
 require('./biz').install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
 require('./book').install({ get, post, put, del, AUTH, ADMIN, ip });
 
@@ -931,6 +932,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method !== 'GET' && req.method !== 'HEAD') throw new HttpError(405, 'متد مجاز نیست.');
     let lm;
+    if ((lm = /^\/c\/(\d+)$/.exec(pathname))) return send(req, res, 200, SEO.cardPage(lm[1], req, TRUST_PROXY), { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     if ((lm = /^\/l\/(\d+)$/.exec(pathname))) return send(req, res, 200, SEO.listingPage(lm[1], req, TRUST_PROXY), { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
     if (pathname === '/sitemap.xml') return send(req, res, 200, SEO.sitemap(req, TRUST_PROXY), { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
     if (pathname === '/robots.txt') return send(req, res, 200, SEO.robots(req, TRUST_PROXY), { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });

@@ -51,6 +51,20 @@ function listingPage(id, req, trustProxy) {
   return out.replace('</head>', tags + redirect + '</head>');
 }
 
+function cardPage(id, req, trustProxy) {
+  const index = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+  const base = baseUrl(req, trustProxy); const target = `/#/card/${+id}`;
+  const redirect = `<script>location.replace(${JSON.stringify(target)})</script><noscript><meta http-equiv="refresh" content="0;url=${esc(target)}"></noscript>`;
+  let u = null;
+  try { u = require('./team').cardData(+id); } catch { /* کارت غیرفعال: فقط هدایت */ }
+  if (!u) return index.replace('</head>', redirect + '</head>');
+  const a = u.agent; const title = `${a.name} — ${a.role === 'admin' ? 'مدیر دال' : 'مشاور املاک'} | دال`;
+  const desc = [a.agency, a.city ? META.findCity(a.city)?.name : '', u.cfg.tagline, u.total ? fa(u.total) + ' آگهی فعال' : ''].filter(Boolean).join(' · ') || 'کارت ویزیت دیجیتال مشاور در دال';
+  const tags = `<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(base + '/c/' + +id)}"><meta property="og:image" content="${esc(base + '/icon-512.png')}"><meta name="description" content="${esc(desc)}">`;
+  const out = index.replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`).replace(/<meta name="description"[^>]*>/, '').replace(/<meta property="og:(title|description)"[^>]*>/g, '');
+  return out.replace('</head>', tags + redirect + '</head>');
+}
+
 function sitemap(req, trustProxy) {
   const base = baseUrl(req, trustProxy);
   const rows = q.all(`SELECT id, updated_at, created_at FROM listings WHERE status='active' ORDER BY id DESC LIMIT 5000`);
@@ -61,4 +75,4 @@ function sitemap(req, trustProxy) {
 
 function robots(req, trustProxy) { return `User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${baseUrl(req, trustProxy)}/sitemap.xml\n`; }
 
-module.exports = { listingPage, sitemap, robots };
+module.exports = { listingPage, cardPage, sitemap, robots };

@@ -452,3 +452,55 @@ test('سرنخ عمومی: ثبت خودکار در کمد اصلی و شمار�
   const hub = await call('/city/kangan'); assert.strictEqual(hub.status, 200); assert.strictEqual(hub.data.city.focus, true); assert.ok(hub.data.districts.length > 20);
   assert.strictEqual((await call('/city/narnia')).status, 404);
 });
+
+test('کارت ویزیت دیجیتال: پیش‌فرض خاموش، vCard، حریم خصوصی شماره', async () => {
+  const r = await call('/admin/users', { token: S.admin, body: { name: 'مشاور کارتی', phone: '09125550301', role: 'agent' } });
+  const lg = await call('/auth/login', { body: { phone: '09125550301', password: r.data.temp_password } }); const T = lg.data.token; const id = r.data.id;
+  assert.strictEqual((await call('/card/' + id)).status, 404, 'تا مشاور روشن نکند عمومی نیست');
+  assert.strictEqual((await call('/me/card', { method: 'PUT', body: { on: true } })).status, 401);
+  const on = await call('/me/card', { method: 'PUT', token: T, body: { on: true, phone: false, tagline: 'مشاور کنگان و شیراز' } }); assert.strictEqual(on.data.cfg.on, true);
+  const c = await call('/card/' + id); assert.strictEqual(c.status, 200); assert.strictEqual(c.data.phone, null, 'شماره بدون رضایت نمایش داده نمی‌شود');
+  assert.ok(!JSON.stringify(c.data).includes('09125550301'));
+  const v1 = await call(`/card/${id}/vcard`); assert.strictEqual(v1.status, 200); assert.ok(v1.data.startsWith('BEGIN:VCARD')); assert.ok(!v1.data.includes('9125550301'), 'vCard هم شماره را فاش نمی‌کند');
+  await call('/me/card', { method: 'PUT', token: T, body: { on: true, phone: true } });
+  assert.strictEqual((await call('/card/' + id)).data.phone, '09125550301');
+  assert.ok((await call(`/card/${id}/vcard`)).data.includes('+989125550301'));
+  const html = await fetch(base.replace(/\/api$/, '') + '/c/' + id).then((x) => x.text()); assert.ok(html.includes('og:title') && html.includes('مشاور کارتی'));
+  await call('/me/card', { method: 'PUT', token: T, body: { on: false } }); assert.strictEqual((await call('/card/' + id)).status, 404);
+});
+
+test('یادآور پیگیری، تقویم گوشی (ICS) و گزارش هفتگی', async () => {
+  const mk = async (name, phone, role = 'user') => { const r = await call('/admin/users', { token: S.admin, body: { name, phone, role } }); const l = await call('/auth/login', { body: { phone, password: r.data.temp_password } }); return { id: r.data.id, token: l.data.token }; };
+  const u = await mk('دارنده‌ی کمد یادآور', '09125550401');
+  const cab = await call('/admin/book', { token: S.admin, body: { user_id: u.id, title: 'کمد یادآور' } }); assert.strictEqual(cab.status, 200);
+  const e = await call(`/book/${cab.data.cabinet.id}/entries`, { token: u.token, body: { kind: 'seeker', name: 'مشتری پیگیری', phone: '09121239999', deal: 'sale', city: 'kangan', next_follow: '2020-01-01' } }); assert.strictEqual(e.status, 200);
+  const rem = await call('/me/reminders', { token: u.token }); assert.ok(rem.data.today.some((x) => x.name === 'مشتری پیگیری'), 'پیگیری عقب‌افتاده در امروز');
+  assert.strictEqual((await call('/admin/reminders/run', { method: 'POST', token: u.token, body: {} })).status, 403);
+  const run = await call('/admin/reminders/run', { method: 'POST', token: S.admin, body: {} }); assert.strictEqual(run.status, 200); assert.ok(run.data.items >= 1);
+  const ns = await call('/notifications', { token: u.token }); assert.ok(ns.data.items.some((n) => n.title.includes('پیگیری') && n.body.includes('مشتری پیگیری')), 'اعلان درون‌برنامه');
+  // تقویم
+  const cal = await call('/me/calendar', { token: u.token }); assert.ok(/^\/api\/cal\/\d+-[a-f0-9]{32}\.ics$/.test(cal.data.path));
+  const ics = await fetch(base.replace(/\/api$/, '') + cal.data.path); assert.strictEqual(ics.status, 200); assert.ok((ics.headers.get('content-type') || '').includes('text/calendar'));
+  const txt = await ics.text(); assert.ok(txt.startsWith('BEGIN:VCALENDAR') && txt.includes('END:VCALENDAR') && txt.includes('\r\n')); assert.ok(txt.includes('BEGIN:VALARM'));
+  assert.strictEqual((await fetch(base.replace(/\/api$/, '') + cal.data.path.replace(/.{6}\.ics$/, '000000.ics'))).status, 404, 'کلید اشتباه');
+  const nk = await call('/me/calendar/reset', { token: u.token, body: {} }); assert.notStrictEqual(nk.data.path, cal.data.path);
+  assert.strictEqual((await fetch(base.replace(/\/api$/, '') + cal.data.path)).status, 404, 'کلید قدیمی باطل شد');
+  // گزارش هفتگی
+  assert.strictEqual((await call('/admin/report/weekly', { token: u.token })).status, 403);
+  const wk = await call('/admin/report/weekly', { token: S.admin }); assert.strictEqual(wk.status, 200); assert.ok(wk.data.text.includes('گزارش هفتگی دال')); assert.ok(wk.data.text.includes('کنگان') && wk.data.text.includes('شیراز'));
+  assert.ok(wk.data.data.due.entries >= 1);
+  const sd = await call('/admin/report/weekly/send', { method: 'POST', token: S.admin, body: {} }); assert.strictEqual(sd.status, 200);
+  const an = await call('/notifications', { token: S.admin }); assert.ok(an.data.items.some((n) => n.title.includes('گزارش هفتگی')));
+});
+
+test('QR: ماتریس معتبر با الگوی یابنده و خطای متن بلند', () => {
+  const { qrMatrix, qrSvg } = require('../../public/js/qr.js');
+  const m = qrMatrix('https://dal.example.ir/c/1');
+  assert.ok(m.length >= 21 && (m.length - 17) % 4 === 0);
+  for (const [r, c] of [[0, 0], [0, m.length - 7], [m.length - 7, 0]]) {
+    assert.ok(m[r][c] && m[r + 6][c + 6] && m[r][c + 6] && m[r + 6][c]);
+    assert.ok(!m[r + 1][c + 1] && m[r + 2][c + 2] && m[r + 3][c + 3]);
+  }
+  assert.match(qrSvg('x', { size: 200 }), /^<svg/);
+  assert.throws(() => qrMatrix('x'.repeat(400)));
+});

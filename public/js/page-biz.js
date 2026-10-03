@@ -150,7 +150,7 @@
       const done = items.filter((d) => d.stage === (tab === 'closed' ? 'closed' : 'lost'));
       mount(app, html`<div class="container section deals-page">
         <div class="sec-head"><div><span class="book-kicker">${icon('chart', 16)} مخصوص مشاوران</span><h1 style="font-size:30px;margin:4px 0">میزکار معاملات و درآمد</h1><p>هر مشتری یک پرونده؛ از اولین تماس تا کمیسیون دریافت‌شده. همه‌ی اعداد فقط از پرونده‌هایی است که خودتان ثبت کرده‌اید.</p></div>
-          <div class="row gap wrap">${data.admin ? html`<div class="seg" id="sc"><button class="${scope === 'me' ? 'on' : ''}" data-s="me">پرونده‌های من</button><button class="${scope === 'all' ? 'on' : ''}" data-s="all">همه‌ی مشاوران</button></div><button class="btn ghost" id="cfg">${icon('settings', 16)} تعرفه‌ی کمیسیون</button>` : ''}<button class="btn primary" id="new-d">${icon('plus', 18)} پرونده‌ی جدید</button></div></div>
+          <div class="row gap wrap">${data.admin ? html`<div class="seg" id="sc"><button class="${scope === 'me' ? 'on' : ''}" data-s="me">پرونده‌های من</button><button class="${scope === 'all' ? 'on' : ''}" data-s="all">همه‌ی مشاوران</button></div><button class="btn ghost" id="cfg">${icon('settings', 16)} تعرفه‌ی کمیسیون</button>` : ''}<button class="btn" id="open-cal">${icon('cal', 16)} تقویم گوشی</button><button class="btn primary" id="new-d">${icon('plus', 18)} پرونده‌ی جدید</button></div></div>
 
         <div class="kpis deal-kpis">
           <div class="kpi goal-kpi"><span class="goal-ring" style="--p:${goalPct}"><b>${r.goal ? fa(goalPct) + '٪' : icon('target', 22)}</b></span><div><small>درآمد این ماه</small><strong>${tmn(r.thisMonth)}</strong><button class="link-btn" id="goal">${r.goal ? 'هدف: ' + short(r.goal) + ' · تغییر' : 'تعیین هدف ماهانه'}</button></div></div>
@@ -175,6 +175,7 @@
     const refresh = async () => { await load(); if (alive()) draw(); };
     draw();
     const idOf = (b) => +b.closest('[data-id]').dataset.id; const dealOf = (b) => data.items.find((x) => x.id === idOf(b));
+    on(app, 'click', '#open-cal', () => Dal.openCalendar());
     on(app, 'click', '#new-d', () => Dal.openDealForm({}, refresh));
     on(app, 'click', '#sc [data-s]', async (e, b) => { scope = b.dataset.s; await refresh(); });
     on(app, 'click', '[data-t]', (e, b) => { tab = b.dataset.t; draw(); });

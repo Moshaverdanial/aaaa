@@ -37,7 +37,7 @@
     mount(app, html`<div class="container section book-page">
       <header class="book-hero"><div><span class="book-kicker">${icon('lock', 16)} فقط برای اعضا</span><h1>دفترچه‌ی دال</h1>
         <p>هر نفر یک کمد دارد؛ خواهان‌ها و مالک‌ها را داخلش ثبت کنید تا دال به‌طور هوشمند بگوید کدام ملک به درد کدام آدم می‌خورد. یک کمد عمومی اصلی هم برای همه‌ی دارندگان کمد هست.</p></div>
-        <div class="book-hero-art" aria-hidden="true">${icon('lock', 56)}</div></header>
+        <div class="book-hero-art" aria-hidden="true">${icon('lock', 56)}</div><button class="btn gold" id="open-cal" style="position:absolute;inset-inline-end:24px;bottom:18px">${icon('cal', 16)} تقویم گوشی</button></header>
       ${r.cabinets.length || r.admin ? html`<div class="locker-wall">${main ? locker(main, 0) : ''}${mine.map((c, i) => locker(c, i + 1))}${r.admin ? html`<button class="locker add" id="new-locker" type="button"><span class="lk-no">${icon('plus', 34)}</span><span class="lk-plate">کمد جدید</span><span class="lk-meta">کمد را به یک نفر بدهید</span></button>` : ''}</div>`
         : html`<div class="panel book-empty">${icon('lock', 36)}<h3>هنوز کمدی برای شما نیست</h3><p class="muted">مدیر دال تعیین می‌کند چه کسانی کمد داشته باشند. اگر توکن یک کمد را دارید، پایین وارد کنید.</p></div>`}
       <form class="panel redeem" id="redeem"><h3>${icon('key', 22)} باز کردن کمد با توکن</h3>
@@ -48,6 +48,7 @@
       if (res) { Dal.toast('کمد باز شد ✅', 'success'); Dal.go('/book/' + res.id); }
     };
     const nl = $('#new-locker', app); if (nl) nl.onclick = newLocker;
+    const oc = $('#open-cal', app); if (oc) oc.onclick = () => Dal.openCalendar();
   }
 
   function newLocker() {

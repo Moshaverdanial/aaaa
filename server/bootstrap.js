@@ -75,6 +75,7 @@ function start() {
     console.log('   ۲) ترمینال: npm run admin -- 09123456789 "نام مدیر"\n');
   }
   expireJob(); setInterval(expireJob, 6 * 3600e3).unref();
+  try { require('./team').start(); } catch (e) { console.error('team:', e.message); }
   require('./tiles').startPrune();
   const X = require('./extern'); setTimeout(() => X.dailyBackup(), 30e3).unref(); setInterval(() => X.dailyBackup(), 6 * 3600e3).unref();
 }

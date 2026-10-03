@@ -9,12 +9,13 @@
     if (Dal.state.user.role !== 'admin') { mount(app, html`<div class="container section">${Dal.empty('دسترسی مجاز نیست', 'این بخش مخصوص مدیران است.', html`<a class="btn primary" href="#/">خانه</a>`)}</div>`); return; }
     Dal.setTitle('پنل مدیریت');
     const st = await Dal.api('/admin/stats'); if (!alive()) return;
-    const tabs = [['overview', 'نمای کلی', 'chart'], ['listings', 'مدیریت آگهی‌ها', 'building', st.pending], ['users', 'کاربران و مشاوران', 'users', st.pendingAgents], ['reports', 'گزارش‌ها', 'flag', st.reports], ['contacts', 'پیام‌های تماس', 'msg', st.contacts], ['articles', 'مجله', 'book'], ['promo', 'ویژه‌سازی و درآمد', 'sparkle'], ['settings', 'تنظیمات', 'settings']];
+    const tabs = [['overview', 'نمای کلی', 'chart'], ['listings', 'مدیریت آگهی‌ها', 'building', st.pending], ['users', 'کاربران و مشاوران', 'users', st.pendingAgents], ['reports', 'گزارش‌ها', 'flag', st.reports], ['contacts', 'پیام‌های تماس', 'msg', st.contacts], ['articles', 'مجله', 'book'], ['promo', 'ویژه‌سازی و درآمد', 'sparkle'], ['report', 'گزارش هفتگی', 'chart'], ['settings', 'تنظیمات', 'settings']];
     mount(app, html`<div class="container section"><div class="sec-head"><div><h1 style="font-size:30px">${icon('shield', 28)} پنل مدیریت دال</h1><p>نظارت بر آگهی‌ها، کاربران و گزارش‌ها</p></div></div>
       <div class="tabs">${tabs.map(([k, l, i, c]) => html`<a class="tab ${k === tab ? 'on' : ''}" href="#/admin/${k}">${icon(i, 17)} ${l} ${c ? html`<em>${num(c)}</em>` : ''}</a>`)}</div><div id="adm"></div></div>`);
     const body = $('#adm', app);
     const T = {
       promo() { return Dal.adminTabs.promo(body); },
+      report() { return Dal.adminTabs.report(body); },
       overview() {
         mount(body, html`<div class="kpis">${Dal.kpi('کاربران', num(st.users), `${num(st.agents)} مشاور`, 'users')}${Dal.kpi('آگهی‌های فعال', num(st.active), `از ${num(st.listings)} آگهی`, 'building', 'ok')}${Dal.kpi('در انتظار تأیید', num(st.pending), '', 'clock', st.pending ? 'warn' : '')}${Dal.kpi('گزارش‌های باز', num(st.reports), '', 'flag', st.reports ? 'bad' : '')}${Dal.kpi('کل بازدید', num(st.views), '', 'eye', 'acc')}${Dal.kpi('درخواست مشاوره', num(st.inquiries), `${num(st.appointments)} رزرو بازدید`, 'msg')}</div>
           <div class="grid g2 mt-lg"><div class="panel" style="margin:0"><h3>${icon('chart', 22)} ترافیک ۱۴ روز اخیر</h3>${st.traffic.length ? Dal.charts.columns(st.traffic.map((x) => ({ x: dateFa(x.day, { day: 'numeric' }), y: x.n }))) : raw('<p class="muted">—</p>')}</div>
