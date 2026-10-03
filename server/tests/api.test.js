@@ -316,3 +316,59 @@ test('فشرده‌سازی بروتلی فایل‌های ایستا', async ()
   const r = await fetch(base.replace(/\/api$/, '') + '/js/core.js', { headers: { 'accept-encoding': 'br' } });
   assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-encoding'), 'br');
 });
+
+test('دفترچه‌ی دال: کمدها، توکن، ثبت‌ها و پیشنهاد هوشمند', async () => {
+  const reg = async (name, phone) => {
+    const r = await call('/admin/users', { token: S.admin, body: { name, phone } }); assert.strictEqual(r.status, 200);
+    const l = await call('/auth/login', { body: { phone, password: r.data.temp_password } }); return { token: l.data.token, user: l.data.user || { id: r.data.id } };
+  };
+  const a = await reg('عضو یک', '09125550001'), b = await reg('عضو دو', '09125550002'), c = await reg('بیرونی', '09125550003');
+  // بدون کمد: دسترسی به کمد اصلی ندارد
+  const l0 = await call('/book', { token: a.token }); assert.strictEqual(l0.data.cabinets.length, 0); assert.strictEqual(l0.data.holder, false);
+  assert.strictEqual((await call('/admin/book', { token: a.token, body: { user_id: a.user.id } })).status, 403);
+  const ca = await call('/admin/book', { token: S.admin, body: { user_id: a.user.id, title: 'کمد آزمایشی ۱' } }); assert.strictEqual(ca.status, 200);
+  assert.strictEqual((await call('/admin/book', { token: S.admin, body: { user_id: a.user.id } })).status, 409, 'هر نفر یک کمد');
+  const cb = await call('/admin/book', { token: S.admin, body: { user_id: b.user.id } }); assert.strictEqual(cb.status, 200);
+  const la = await call('/book', { token: a.token }); assert.strictEqual(la.data.holder, true);
+  assert.strictEqual(la.data.cabinets.length, 2, 'کمد اصلی + کمد شخصی'); assert.strictEqual(la.data.cabinets[0].kind, 'main');
+  const mine = la.data.cabinets.find((x) => x.kind === 'personal'); const main = la.data.cabinets[0];
+  assert.ok(/^DK-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(mine.token), 'توکن'); assert.strictEqual(main.token, null, 'توکن کمد اصلی پنهان');
+  // کمد دیگران بسته است
+  assert.strictEqual((await call('/book/' + cb.data.cabinet.id, { token: a.token })).status, 404);
+  assert.strictEqual((await call('/book/' + mine.id, { token: c.token })).status, 404);
+  // ثبت خواهان و مالک
+  const seekBody = { kind: 'seeker', name: 'آقای خریدار', phone: '۰۹۱۲۱۱۱۲۲۲۲', deal: 'sale', ptype: 'apartment', city: 'kangan', price_max: 5e9, rooms: 2, area: 80 };
+  assert.strictEqual((await call(`/book/${mine.id}/entries`, { token: c.token, body: seekBody })).status, 404);
+  assert.strictEqual((await call(`/book/${mine.id}/entries`, { token: a.token, body: { ...seekBody, phone: '123' } })).status, 400);
+  const s1 = await call(`/book/${mine.id}/entries`, { token: a.token, body: seekBody }); assert.strictEqual(s1.status, 200); assert.strictEqual(s1.data.entry.phone, '09121112222');
+  const dup = await call(`/book/${mine.id}/entries`, { token: a.token, body: seekBody }); assert.strictEqual(dup.status, 409); assert.strictEqual(dup.data.existing, s1.data.id);
+  const o1 = await call(`/book/${main.id}/entries`, { token: b.token, body: { kind: 'owner', name: 'خانم مالک', phone: '09123334444', deal: 'sale', ptype: 'apartment', city: 'kangan', area: 90, rooms: 2, price: 4.5e9 } });
+  assert.strictEqual(o1.status, 200);
+  const o2 = await call(`/book/${main.id}/entries`, { token: b.token, body: { kind: 'owner', name: 'مالک گران', phone: '09123335555', deal: 'sale', ptype: 'apartment', city: 'kangan', area: 90, rooms: 2, price: 9e9 } });
+  // پیشنهاد برای خواهان: مالک مناسب در کمد اصلی (کاربر الف عضو کمد اصلی است)
+  const m = await call(`/book/entries/${s1.data.id}/matches`, { token: a.token }); assert.strictEqual(m.status, 200);
+  const top = m.data.items.find((x) => x.type === 'entry' && x.id === o1.data.id); assert.ok(top, 'مالک مناسب پیشنهاد شود'); assert.ok(top.score >= 85, 'امتیاز بالا: ' + top.score); assert.ok(top.reasons.length >= 3); assert.ok(top.message.includes('آقای خریدار'));
+  const far = m.data.items.find((x) => x.id === o2.data.id); assert.ok(!far || far.score < top.score, 'مالک گران امتیاز کمتر');
+  // برعکس: برای مالک، خواهان مناسب
+  const m2 = await call(`/book/entries/${o1.data.id}/matches`, { token: b.token });
+  assert.strictEqual(m2.status, 200); assert.ok(!m2.data.items.some((x) => x.id === s1.data.id), 'کاربر ب به کمد الف دسترسی ندارد و خواهان او را نمی‌بیند');
+  // توکن: ج با توکن کمد الف عضو می‌شود
+  assert.strictEqual((await call('/book/redeem', { token: c.token, body: { token: 'DK-XXXX-XXXX-XXXX' } })).status, 404);
+  assert.strictEqual((await call('/book/redeem', { token: c.token, body: { token: mine.token } })).status, 200);
+  const lc = await call('/book', { token: c.token }); assert.strictEqual(lc.data.cabinets.length, 1); assert.strictEqual(lc.data.cabinets[0].token, null, 'عضو میهمان توکن را نمی‌بیند');
+  assert.strictEqual((await call('/book/' + main.id, { token: c.token })).status, 404, 'میهمان به کمد اصلی دسترسی ندارد');
+  const det = await call('/book/' + mine.id, { token: a.token }); assert.strictEqual(det.data.members.length, 1); assert.strictEqual(det.data.entries.length, 1);
+  assert.strictEqual((await call(`/book/${mine.id}/members/${c.user.id}`, { method: 'DELETE', token: a.token })).status, 200);
+  assert.strictEqual((await call('/book/' + mine.id, { token: c.token })).status, 404);
+  // پیگیری و حذف
+  const t = await call(`/book/entries/${s1.data.id}/touch`, { token: a.token, body: { note: 'تماس گرفتم', next_follow: '2020-01-01' } }); assert.strictEqual(t.data.entry.due, true);
+  assert.ok((await call('/book/' + mine.id, { token: a.token })).data.insights.due.length >= 1);
+  assert.strictEqual((await call('/book/entries/' + o1.data.id, { method: 'DELETE', token: a.token })).status, 403, 'حذف ثبت دیگری در کمد اصلی');
+  assert.strictEqual((await call('/book/entries/' + o1.data.id, { method: 'DELETE', token: b.token })).status, 200);
+  // تحلیل جمله
+  const p = await call('/book/parse', { token: a.token, body: { text: 'خواهان آپارتمان ۲ خوابه در کنگان تا ۵ میلیارد ۰۹۱۲۳۴۵۶۷۸۹' } });
+  assert.strictEqual(p.data.fields.city, 'kangan'); assert.strictEqual(p.data.fields.rooms, 2); assert.strictEqual(p.data.fields.price_max, 5e9); assert.strictEqual(p.data.fields.phone, '09123456789');
+  // حذف کمد توسط مدیر؛ کمد اصلی حذف نمی‌شود
+  assert.strictEqual((await call('/admin/book/' + main.id, { method: 'DELETE', token: S.admin })).status, 400);
+  assert.strictEqual((await call('/admin/book/' + mine.id, { method: 'DELETE', token: S.admin })).status, 200);
+});

@@ -42,6 +42,7 @@
         <a href="#/search?deal=presale" data-nav="presale">پیش‌فروش</a>
         <a href="#/agents" data-nav="agents">مشاوران</a>
         <div class="dd"><button class="nav-btn" aria-haspopup="true">ابزارها ${icon('chevd', 16)}</button><div class="dd-menu">${TOOL_LINKS.map(([h, i, t]) => html`<a href="#${h}">${icon(i, 18)} ${t}</a>`)}</div></div>
+        <a href="#/book" data-nav="book">دفترچه</a>
         <a href="#/consult" data-nav="consult">مشاوره</a>
         <a href="#/magazine" data-nav="magazine">مجله</a>
       </nav>
@@ -55,7 +56,7 @@
           <div class="dd" id="bell-dd"><button class="hbtn" aria-label="اعلان‌ها" aria-haspopup="true">${icon('bell', 20)}<span class="dot-badge bell-badge ${n?.unread ? '' : 'hide'}">${num(n?.unread || 0)}</span></button><div class="dd-menu notif" id="bell-menu"></div></div>
           <div class="dd"><button class="user-pill" aria-haspopup="true">${Dal.avatar(u, 34)}<span>${u.name.split(' ')[0]}</span></button>
             <div class="dd-menu"><div style="padding:8px 12px"><b>${u.name}</b><div class="muted" style="font-size:12.5px">${{ admin: 'مدیر سیستم', agent: 'مشاور املاک', user: 'کاربر' }[u.role]}</div></div><hr>
-              <a href="#/dashboard">${icon('layers', 18)} داشبورد من</a><a href="#/dashboard/listings">${icon('building', 18)} آگهی‌های من</a><a href="#/messages">${icon('msg', 18)} پیام‌ها ${n?.messages ? html`<span class="pill info">${num(n.messages)}</span>` : ''}</a><a href="#/dashboard/profile">${icon('settings', 18)} تنظیمات حساب</a>
+              <a href="#/dashboard">${icon('layers', 18)} داشبورد من</a><a href="#/book">${icon('lock', 18)} دفترچه‌ی دال</a><a href="#/dashboard/listings">${icon('building', 18)} آگهی‌های من</a><a href="#/messages">${icon('msg', 18)} پیام‌ها ${n?.messages ? html`<span class="pill info">${num(n.messages)}</span>` : ''}</a><a href="#/dashboard/profile">${icon('settings', 18)} تنظیمات حساب</a>
               ${u.role === 'admin' ? html`<a href="#/admin">${icon('shield', 18)} پنل مدیریت</a>` : ''}<hr><a href="#" id="logout-btn">${icon('logout', 18)} خروج</a></div></div>`
         : html`<a class="btn ghost hide-sm" href="#/login">ورود</a>`}
         <a class="btn primary hide-sm" href="#/new">${icon('plus', 18)} ثبت آگهی</a>
@@ -85,7 +86,7 @@
   ui.highlightNav = function (path) {
     const { query } = Dal.parseHash();
     $$('.nav a').forEach((a) => {
-      const k = a.dataset.nav; a.classList.toggle('on', (path === '/search' && k === (query.deal || 'sale') && ['sale', 'rent', 'presale'].includes(k)) || (k === 'agents' && path.startsWith('/agent')) || (k === 'magazine' && /^\/(magazine|article)/.test(path)) || (k === 'consult' && path === '/consult'));
+      const k = a.dataset.nav; a.classList.toggle('on', (path === '/search' && k === (query.deal || 'sale') && ['sale', 'rent', 'presale'].includes(k)) || (k === 'agents' && path.startsWith('/agent')) || (k === 'magazine' && /^\/(magazine|article)/.test(path)) || (k === 'consult' && path === '/consult') || (k === 'book' && path.startsWith('/book')));
     });
     $$('.bottom-nav a').forEach((a) => a.classList.toggle('on', a.getAttribute('href').replace('#', '').split('?')[0] === path));
     ui.updateCompareBadge();
@@ -117,7 +118,7 @@
         <a href="#/search?deal=sale">${icon('home', 20)} خرید</a><a href="#/search?deal=rent">${icon('key', 20)} رهن و اجاره</a><a href="#/search?deal=presale">${icon('building', 20)} پیش‌فروش</a><a href="#/search?view=map">${icon('map', 20)} نقشه</a><a href="#/agents">${icon('users', 20)} مشاوران</a>
         <div class="divider"></div>${TOOL_LINKS.map(([h, i, t]) => html`<a href="#${h}">${icon(i, 20)} ${t}</a>`)}<div class="divider"></div>
         <a href="#/magazine">${icon('book', 20)} مجله</a><a href="#/about">${icon('info', 20)} درباره‌ی دال</a>
-        ${u ? html`<a href="#/dashboard">${icon('user', 20)} داشبورد</a><a href="#/messages">${icon('msg', 20)} پیام‌ها</a>` : html`<a href="#/login">${icon('user', 20)} ورود / ثبت‌نام</a>`}
+        ${u ? html`<a href="#/dashboard">${icon('user', 20)} داشبورد</a><a href="#/messages">${icon('msg', 20)} پیام‌ها</a><a href="#/book">${icon('lock', 20)} دفترچه‌ی دال</a>` : html`<a href="#/login">${icon('user', 20)} ورود / ثبت‌نام</a>`}
         <a class="btn primary block" href="#/new" style="margin-top:12px;color:#fff">${icon('plus', 18)} ثبت آگهی رایگان</a></aside>`);
       requestAnimationFrame(() => d.classList.add('open'));
     } else { d.classList.remove('open'); }
@@ -156,7 +157,7 @@
     const items = [
       ['/', 'home', 'صفحه‌ی اصلی'], ['/search?deal=sale', 'home', 'خرید ملک'], ['/search?deal=rent', 'key', 'رهن و اجاره'], ['/search?deal=presale', 'building', 'پیش‌فروش'], ['/search?view=map', 'map', 'جستجو روی نقشه'],
       ['/valuation', 'sparkle', 'برآورد قیمت ملک'], ['/market', 'chart', 'تحلیل بازار'], ['/tools', 'calc', 'ماشین‌حساب‌ها'], ['/tools?t=convert', 'refresh', 'تبدیل رهن به اجاره'], ['/tools?t=loan', 'dollar', 'ماشین‌حساب وام مسکن'], ['/tools?t=rentbuy', 'trend', 'اجاره یا خرید؟'],
-      ['/agents', 'users', 'مشاوران املاک'], ['/magazine', 'book', 'مجله'], ['/requests', 'target', 'درخواست ملک'], ['/compare', 'compare', 'مقایسه‌ی املاک'], ['/new', 'plus', 'ثبت آگهی جدید'], ['/dashboard', 'layers', 'داشبورد'], ['/messages', 'msg', 'پیام‌ها'], ['/about', 'info', 'درباره‌ی دال'],
+      ['/agents', 'users', 'مشاوران املاک'], ['/magazine', 'book', 'مجله'], ['/requests', 'target', 'درخواست ملک'], ['/compare', 'compare', 'مقایسه‌ی املاک'], ['/new', 'plus', 'ثبت آگهی جدید'], ['/book', 'lock', 'دفترچه‌ی دال'], ['/dashboard', 'layers', 'داشبورد'], ['/messages', 'msg', 'پیام‌ها'], ['/about', 'info', 'درباره‌ی دال'],
     ];
     const m = Dal.modal(html`<div class="palette"><input id="pal-in" placeholder="کجا بروم؟ یا جمله‌ای بنویسید: «آپارتمان ۲ خوابه در ونک»" autocomplete="off"><div class="pal-list" id="pal-list"></div><p class="muted" style="font-size:12px;margin-top:8px"><span class="kbd">Enter</span> برای باز کردن · <span class="kbd">Esc</span> برای بستن</p></div>`);
     const inp = $('#pal-in', m.body), list = $('#pal-list', m.body); let sel = 0, cur = [];

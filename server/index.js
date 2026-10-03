@@ -878,6 +878,9 @@ get('/api/admin/reports', ADMIN, () => ({ items: q.all(`SELECT r.*, l.title, l.c
 put('/api/admin/reports/:id', ADMIN, (ctx) => { q.run('UPDATE reports SET status=? WHERE id=?', ctx.body.status === 'resolved' ? 'resolved' : 'dismissed', +ctx.params.id); return { ok: true }; });
 
 // ------------------------------------------------------------------ server
+// دفترچه‌ی دال (کمدها، ثبت‌ها و پیشنهاد هوشمند)
+require('./book').install({ get, post, put, del, AUTH, ADMIN, ip });
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   const pathname = decodeURIComponent(url.pathname);
@@ -933,7 +936,7 @@ const server = http.createServer(async (req, res) => {
     return serveFile(req, res, file, /\.(woff2|png|svg)$/.test(file) ? 'public, max-age=2592000' : 'no-cache');
   } catch (e) {
     if (!(e instanceof HttpError)) console.error(e);
-    send(req, res, e.status || 500, { error: e instanceof HttpError ? e.message : 'خطای داخلی سرور.' });
+    send(req, res, e.status || 500, { error: e instanceof HttpError ? e.message : 'خطای داخلی سرور.', ...(e instanceof HttpError && e.extra ? e.extra : {}) });
   }
 });
 

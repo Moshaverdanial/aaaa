@@ -119,7 +119,7 @@
     let data = {}; try { data = await res.json(); } catch { /* empty */ }
     if (!res.ok) {
       if (res.status === 401 && t) { Dal.logout(true); }
-      const e = new Error(data.error || 'خطایی رخ داد.'); e.status = res.status; throw e;
+      const e = new Error(data.error || 'خطایی رخ داد.'); e.status = res.status; e.data = data; throw e;
     }
     return data;
   }
