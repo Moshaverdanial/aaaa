@@ -59,7 +59,7 @@
     const tileCities = meta.cities.filter((c) => !fc.some((f) => f.slug === c.slug)).map((c) => ({ slug: c.slug, name: c.name, n: stats.byCity.find((x) => x.slug === c.slug)?.n || 0 })).filter((c) => c.n > 0);
     const topGrow = market.districts.filter((d) => d.growth12 != null).sort((a, b) => b.growth12 - a.growth12).slice(0, 6);
     mount(app, html`
-    <section class="hero"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="hero-skyline"></div>
+    <section class="hero"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="hero-skyline"></div><div class="crystal" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <div class="hero-float">
       <div class="hf-card"><span class="hf-ic">${icon('sparkle', 20)}</span><div><b>برآورد قیمت هوشمند</b><small>از روی آگهی‌های واقعی</small></div></div>
       <div class="hf-card"><span class="hf-ic">${icon('map', 20)}</span><div><b>جستجو روی نقشه</b><small>کنگان و شیراز</small></div></div>
