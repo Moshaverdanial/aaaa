@@ -340,4 +340,34 @@ function install({ get, post, put, del, AUTH, ADMIN, ip }) {
   });
 }
 
-module.exports = { install, score, ensureMain, makeToken, DEALS };
+
+// ------------------------------------------------------------------ سرنخ‌های سایت → کمد اصلی
+/** ثبت خودکار سرنخ (از فرم عمومی سایت یا درخواست ملک) در «کمد اصلی»؛ اگر همان شماره قبلاً بود، فقط به‌روز می‌شود. */
+function addLead(kind, body, tag) {
+  const main = ensureMain();
+  const row = cleanEntry({ ...body, kind, tags: [tag] });
+  const dup = q.get('SELECT id,note,tags FROM book_entries WHERE cabinet_id=? AND phone=? AND kind=?', main.id, row.phone, row.kind);
+  if (dup) {
+    const note = [dup.note, `— ${today()} (${tag}): ${row.note || 'ثبت مجدد'}`].filter(Boolean).join('\n').slice(0, 1000);
+    const tags = [...new Set([...U.jparse(dup.tags, []), tag])].slice(0, 6);
+    q.run(`UPDATE book_entries SET status='active', note=?, tags=?, next_follow=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`, note, JSON.stringify(tags), today(), dup.id);
+    return { id: dup.id, row, existing: true };
+  }
+  row.next_follow = today(); // تماس فوری با سرنخ تازه
+  const id = q.run(`INSERT INTO book_entries (cabinet_id,${COLS.join(',')},created_by) VALUES (?,${COLS.map(() => '?').join(',')},NULL)`, main.id, ...COLS.map((c) => row[c])).lastInsertRowid;
+  return { id: Number(id), row, existing: false };
+}
+/** برای مالک: چند خواهان فعال (در همه‌ی کمدها) با ملکش می‌خواند. برای خواهان: چند آگهی و ثبت مالک. فقط عدد برمی‌گردد، نه اطلاعات شخصی. */
+function interestedCount(kind, row) {
+  const min = 60;
+  if (kind === 'owner') {
+    const off = toOffer(row);
+    return q.all(`SELECT * FROM book_entries WHERE kind='seeker' AND status='active' AND deal=? AND city=? LIMIT 800`, row.deal, row.city).filter((r) => { const sc = score(toSeek(r), off); return sc && sc.score >= min; }).length;
+  }
+  const s = toSeek(row);
+  const ls = q.all(`SELECT id,deal,ptype,price,rent,area,rooms,city,district FROM listings WHERE status='active' AND deal=? AND city=? LIMIT 800`, row.deal, row.city).filter((l) => { const sc = score(s, toOffer(l)); return sc && sc.score >= min; }).length;
+  const es = q.all(`SELECT * FROM book_entries WHERE kind='owner' AND status='active' AND deal=? AND city=? LIMIT 800`, row.deal, row.city).filter((r) => { const sc = score(s, toOffer(r)); return sc && sc.score >= min; }).length;
+  return { listings: ls, entries: es };
+}
+
+module.exports = { install, score, ensureMain, makeToken, DEALS, addLead, interestedCount, accessibleIds };

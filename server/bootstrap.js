@@ -59,6 +59,7 @@ function expireJob() {
   for (const l of warn) { S.notify(l.owner_id, 'آگهی شما رو به انقضاست ⏳', `«${l.title}» تا ۱۰ روز دیگر بایگانی می‌شود. برای تمدید وارد «آگهی‌های من» شوید.`, '#/dashboard/listings'); q.run('UPDATE listings SET expire_warned=1 WHERE id=?', l.id); }
   const exp = q.all(`SELECT id, owner_id, title FROM listings WHERE status='active' AND renewed_at < ${days(EXPIRE_DAYS)}`);
   for (const l of exp) { q.run(`UPDATE listings SET status='archived' WHERE id=?`, l.id); S.notify(l.owner_id, 'آگهی بایگانی شد', `«${l.title}» منقضی شد. می‌توانید آن را تمدید کنید.`, '#/dashboard/listings'); }
+  try { require('./biz').featuredSweep(); } catch { /* ignore */ }
   return { warned: warn.length, expired: exp.length };
 }
 

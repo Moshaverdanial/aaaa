@@ -649,6 +649,9 @@ post('/api/requests', AUTH, (ctx) => {
   if (q.get(`SELECT COUNT(*) n FROM requests WHERE user_id=? AND status='open'`, ctx.user.id).n >= 5) throw new HttpError(400, 'حداکثر ۵ درخواست فعال می‌توانید داشته باشید.');
   const id = q.run('INSERT INTO requests (user_id,title,deal,ptype,city,district,budget_max,rent_max,area_min,rooms,description) VALUES (?,?,?,?,?,?,?,?,?,?,?)', ctx.user.id, title, b.deal, META.PTYPES[b.ptype] ? b.ptype : null,
     META.findCity(b.city)?.slug || null, META.findDistrict(b.city, b.district)?.slug || null, clampInt(b.budget_max, 0, 1e15, 0), clampInt(b.rent_max, 0, 1e12, 0), clampInt(b.area_min, 0, 10000, 0), clampInt(b.rooms, 0, 10, 0), str(b.description, 800)).lastInsertRowid;
+  try { // درخواست ثبت‌شده‌ی کاربر هم خودکار وارد «کمد اصلی» دفترچه می‌شود تا تیم پیگیری کند
+    require('./book').addLead('seeker', { name: ctx.user.name, phone: ctx.user.phone, deal: b.deal, ptype: b.ptype, city: b.city, districts: b.district ? [b.district] : [], price_max: b.budget_max, rent_max: b.rent_max, area: b.area_min, rooms: b.rooms, note: title }, 'درخواست در سایت');
+  } catch { /* بدون شهر یا داده‌ی ناقص: فقط در بخش درخواست‌ها می‌ماند */ }
   return { id };
 });
 del('/api/requests/:id', AUTH, (ctx) => {
@@ -879,6 +882,7 @@ put('/api/admin/reports/:id', ADMIN, (ctx) => { q.run('UPDATE reports SET status
 
 // ------------------------------------------------------------------ server
 // دفترچه‌ی دال (کمدها، ثبت‌ها و پیشنهاد هوشمند)
+require('./biz').install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
 require('./book').install({ get, post, put, del, AUTH, ADMIN, ip });
 
 const server = http.createServer(async (req, res) => {

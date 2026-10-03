@@ -164,6 +164,7 @@ function addCol(table, col, def) {
 addCol('users', 'recovery_hash', 'TEXT');
 addCol('users', 'pwv', 'INTEGER DEFAULT 0');
 addCol('listings', 'renewed_at', 'TEXT');
+addCol('listings', 'featured_until', 'TEXT');
 addCol('listings', 'expire_warned', 'INTEGER DEFAULT 0');
 db.exec(`UPDATE listings SET renewed_at = COALESCE(updated_at, created_at) WHERE renewed_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_listings_created ON listings(created_at);
