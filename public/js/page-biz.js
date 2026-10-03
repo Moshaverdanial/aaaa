@@ -134,7 +134,7 @@
     if (!Dal.requireLogin()) return;
     if (!Dal.isAgent()) { mount(app, html`<div class="container section">${Dal.empty('مخصوص مشاوران دال', 'میزکار معاملات برای مشاوران و مدیر است. مدیر دال می‌تواند حساب مشاور برای شما بسازد.', html`<a class="btn primary" href="#/consult">درخواست مشاوره</a>`)}</div>`); return; }
     Dal.setTitle('میزکار معاملات');
-    let scope = query.scope === 'all' ? 'all' : 'me'; let data; let tab = 'board';
+    let scope = query.scope === 'all' ? 'all' : 'me'; let data; let tab = 'closed';
     const load = async () => { data = await Dal.api('/deals', { query: scope === 'all' ? { scope: 'all' } : {} }); };
     mount(app, html`<div class="container section"><div class="card-skel" style="height:300px;border-radius:20px"></div></div>`);
     try { await load(); } catch (e) { if (alive()) mount(app, html`<div class="container section">${Dal.empty('خطا', e.message)}</div>`); return; }
