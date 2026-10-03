@@ -2,7 +2,7 @@
 //  • پوسته‌ی برنامه: شبکه‌اول (۴ ثانیه) و در صورت قطع، از حافظه
 //  • کاشی‌های نقشه: حافظه‌اول (دیده‌شده‌ها بدون اینترنت هم نمایش داده می‌شوند)
 //  • داده‌های عمومی (آگهی‌ها، متا، آمار): شبکه‌اول و در صورت قطع، آخرین نسخه‌ی ذخیره‌شده
-const VER = 'v4';
+const VER = 'v5';
 const SHELL_CACHE = 'dal-shell-' + VER, TILE_CACHE = 'dal-tiles-' + VER, API_CACHE = 'dal-api-' + VER;
 const SHELL = ['/', '/css/app.css', '/js/core.js', '/js/components.js', '/js/shell.js', '/js/app.js', '/js/page-home.js', '/js/page-search.js', '/js/page-listing.js', '/js/page-tools.js', '/js/page-market.js', '/js/page-people.js', '/js/page-consult.js', '/js/page-auth.js', '/js/page-account.js', '/js/page-new.js', '/js/page-admin.js', '/vendor/leaflet/leaflet.js', '/vendor/leaflet/leaflet.css', '/fonts/Vazirmatn.woff2', '/icon.svg', '/manifest.webmanifest'];
 const PUBLIC_API = /^\/api\/(meta|listings|stats\/home|articles|agents|analytics\/market|analytics\/trend)(\/|$|\?)/;

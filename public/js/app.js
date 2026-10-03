@@ -21,7 +21,14 @@
     return;
   }
   try { Dal.state.needsSetup = (await Dal.api('/setup/status')).needsSetup; } catch { /* ignore */ }
-  if (Dal.state.needsSetup && !/^#\/setup/.test(location.hash)) location.hash = '#/setup';
+  // سایت قبل از راه‌اندازی هم دیده می‌شود؛ فقط یک نوار بالا مدیر را به ساخت حساب هدایت می‌کند
+  if (Dal.state.needsSetup) {
+    const bar = document.createElement('a'); bar.className = 'setup-bar'; bar.href = '#/setup';
+    bar.textContent = 'این سایت هنوز راه‌اندازی نشده است — برای ساخت حساب مدیر اینجا را بزنید ←';
+    document.body.prepend(bar);
+    window.addEventListener('hashchange', () => { bar.style.display = /^#\/setup/.test(location.hash) ? 'none' : ''; });
+    bar.style.display = /^#\/setup/.test(location.hash) ? 'none' : '';
+  }
   Dal.ui.renderHeader(); Dal.ui.renderFooter(); Dal.ui.renderFab();
   if (Dal.state.user) Dal.setSession(null, Dal.state.user);
   Dal.ready = true; await Dal.render();

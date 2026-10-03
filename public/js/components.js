@@ -148,7 +148,8 @@
   })();
   Dal.makeMap = async (el, { center, zoom = 12, scroll = false } = {}) => {
     const L = await Dal.loadLeaflet();
-    const map = L.map(el, { center, zoom, scrollWheelZoom: scroll, zoomControl: true, attributionControl: true });
+    const map = L.map(el, { center, zoom, scrollWheelZoom: scroll, zoomControl: true, attributionControl: false });
+    L.control.attribution({ prefix: false }).addTo(map);
     const dark = document.documentElement.dataset.theme === 'dark';
     // کاشی‌ها از خود سرور دال می‌آیند (کش دیسکی)؛ مرورگر به سرور نقشه‌ی خارجی وصل نمی‌شود
     const layer = L.tileLayer(`/tiles/${dark ? 'dark' : 'light'}/{z}/{x}/{y}.png`, { maxZoom: 18, attribution: '© OpenStreetMap', crossOrigin: false }).addTo(map);

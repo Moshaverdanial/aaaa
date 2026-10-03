@@ -355,3 +355,6 @@ a.hf-call:hover { background: rgba(255, 255, 255, .26); }
 .net-bar { position: fixed; top: 0; inset-inline: 0; z-index: 200; background: #f59f00; color: #1a1300; text-align: center; padding: 8px 12px; font-size: 13.5px; font-weight: 700; }
 .map-offline { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 14px, var(--surface) 14px, var(--surface) 28px) !important; }
 .map-note { position: absolute; z-index: 800; bottom: 10px; inset-inline: 10px; background: rgba(20, 26, 46, .82); color: #fff; padding: 8px 12px; border-radius: 10px; font-size: 12.5px; text-align: center; direction: rtl; pointer-events: none; }
+
+.setup-bar { display: block; background: linear-gradient(90deg, #5b3df5, #b061ff); color: #fff; text-align: center; padding: 9px 14px; font-size: 13.5px; font-weight: 700; text-decoration: none; }
+.setup-bar:hover { filter: brightness(1.08); }
