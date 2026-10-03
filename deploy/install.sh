@@ -39,7 +39,33 @@ fi
 install -m 0644 "$DAL_JS" "$APP/dal.js"
 chown -R dal:dal "$APP"
 SRC="$(dirname "$0")/dal.service"; [ -f "$SRC" ] || SRC="$(dirname "$DAL_JS")/deploy/dal.service"
-sed "s#/opt/dal/node/bin/node#$NODE_BIN#" "$SRC" > /etc/systemd/system/dal.service
+if [ -f "$SRC" ]; then sed "s#/opt/dal/node/bin/node#$NODE_BIN#" "$SRC" > /etc/systemd/system/dal.service
+else  # فایل dal.service همراه نبود؛ سرویس را همین‌جا می‌سازیم
+cat > /etc/systemd/system/dal.service <<UNIT
+[Unit]
+Description=Dal real-estate platform
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=$APP
+ExecStart=$NODE_BIN --no-warnings $APP/dal.js
+Environment=PORT=3000
+Environment=TRUST_PROXY=1
+EnvironmentFile=-$APP/data/.env
+Restart=always
+RestartSec=3
+User=dal
+Group=dal
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=$APP
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+fi
 systemctl daemon-reload && systemctl enable --now dal
 sleep 2; systemctl --no-pager --lines=8 status dal || true
 echo
