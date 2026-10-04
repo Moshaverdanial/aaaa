@@ -1,0 +1,94 @@
+# ساخت خودکار اپ اندروید دال (APK) روی سرورهای رایگان گیت‌هاب.
+# اجرای دستی: برگه‌ی Actions ← «Build Android APK» ← Run workflow  (می‌توانید آدرس سرور را هم بدهید)
+# بعد از پایان: Releases ← android-latest ← فایل dal.apk
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_url:
+        description: 'آدرس سرور دال (اختیاری؛ مثلا https://dal.example.ir). خالی = اپ در اولین اجرا می‌پرسد'
+        required: false
+        default: ''
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Accept Android licenses
+        shell: bash
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Build release APK
+        shell: bash
+        working-directory: android
+        env:
+          SERVER_URL: ${{ inputs.server_url || vars.DAL_SERVER_URL }}
+        run: |
+          gradle --no-daemon --stacktrace assembleRelease \
+            -PdalVersionCode=${{ github.run_number }} \
+            -PdalVersionName=1.${{ github.run_number }} \
+            -PdalServer="${SERVER_URL}" 2>&1 | tee ../build.log
+
+      - name: Collect APK
+        shell: bash
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk out/dal.apk
+          ls -la out
+
+      - name: Show build errors as annotation
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          t = open('build.log', errors='replace').read()
+          lines = t.splitlines()
+          keep = []
+          for i, l in enumerate(lines):
+              if re.search(r'error:|FAILURE|What went wrong|Exception|Could not|not found|cannot find', l, re.I):
+                  keep.extend(lines[max(0, i-1):i+4])
+          msg = '\n'.join(dict.fromkeys(keep))[:6000] or t[-3000:]
+          msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=Android build failed::' + msg)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dal-android-apk
+          path: out/dal.apk
+
+      - name: Publish release (android-latest)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --cleanup-tag -y || true
+          gh release create android-latest out/dal.apk \
+            --target "${{ github.sha }}" \
+            --title "Dal Android 1.${{ github.run_number }}" \
+            --notes "APK نصب‌شدنی اپ اندروید دال. نسخه 1.${{ github.run_number }}"

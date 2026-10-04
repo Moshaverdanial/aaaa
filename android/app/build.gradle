@@ -1,0 +1,57 @@
+plugins {
+    id 'com.android.application'
+}
+
+// آدرس پیش‌فرض سرور (اختیاری): ./gradlew assembleRelease -PdalServer=https://dal.example.ir
+// اگر خالی باشد، اپ در اولین اجرا آدرس سرور را می‌پرسد.
+def dalServer = (project.findProperty('dalServer') ?: '').toString().trim()
+def dalVersionCode = (project.findProperty('dalVersionCode') ?: '1').toString().toInteger()
+def dalVersionName = (project.findProperty('dalVersionName') ?: '1.0').toString()
+
+android {
+    namespace 'ir.dal.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ir.dal.app'
+        minSdk 24
+        targetSdk 34
+        versionCode dalVersionCode
+        versionName dalVersionName
+        buildConfigField 'String', 'DEFAULT_SERVER', '"' + dalServer.replace('"', '') + '"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('../dal-release.p12')
+            storePassword 'dalandroid'
+            keyAlias 'dal'
+            keyPassword 'dalandroid'
+            storeType 'pkcs12'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
