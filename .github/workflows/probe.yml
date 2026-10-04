@@ -1,0 +1,10 @@
+name: probe
+on:
+  push:
+    branches: [arena/01a0f735-aaaa]
+  workflow_dispatch:
+jobs:
+  hi:
+    runs-on: ubuntu-latest
+    steps:
+      - run: java -version; echo $ANDROID_HOME; ls $ANDROID_HOME 2>/dev/null | head; gradle -v | head -5
