@@ -162,8 +162,22 @@
   });
 
   // ---------------------------------------------------------------- auth
-  Dal.setSession = (token, user) => { if (token) localStorage.setItem(TOKEN_KEY, token); Dal.state.user = user; Dal.ui.renderHeader && Dal.ui.renderHeader(); startPolling(); };
-  Dal.logout = (silent) => { localStorage.removeItem(TOKEN_KEY); Dal.state.user = null; Dal.ui.renderHeader && Dal.ui.renderHeader(); stopPolling(); if (!silent) toast('از حساب خود خارج شدید.', 'info'); if (/^#\/(dashboard|messages|new|edit|admin|favorites)/.test(location.hash)) location.hash = '#/'; };
+  // ---- اپ اندروید (پوسته‌ی WebView): پل window.DalAndroid
+  Dal.isApp = !!window.DalAndroid;
+  const bridge = (fn, ...a) => { try { return window.DalAndroid && window.DalAndroid[fn] ? window.DalAndroid[fn](...a) : undefined; } catch { return undefined; } };
+  Dal.bridge = bridge;
+  // دانلود فایل؛ در اپ اندروید لینک blob کار نمی‌کند، پس فایل مستقیم به اپ داده می‌شود.
+  Dal.download = async (name, data, type = 'application/octet-stream') => {
+    const blob = data instanceof Blob ? data : new Blob([data], { type });
+    if (window.DalAndroid && window.DalAndroid.saveFile) {
+      const b64 = await new Promise((res) => { const r = new FileReader(); r.onloadend = () => res(String(r.result).split(',')[1] || ''); r.readAsDataURL(blob); });
+      return bridge('saveFile', name, blob.type || type, b64);
+    }
+    const a = document.createElement('a'); const u = URL.createObjectURL(blob); a.href = u; a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(u); a.remove(); }, 1500);
+  };
+  Dal.setSession = (token, user) => { if (token) localStorage.setItem(TOKEN_KEY, token); if (Dal.isApp && Dal.token()) bridge('setToken', Dal.token()); Dal.state.user = user; Dal.ui.renderHeader && Dal.ui.renderHeader(); startPolling(); };
+  Dal.logout = (silent) => { localStorage.removeItem(TOKEN_KEY); bridge('clearToken'); Dal.state.user = null; Dal.ui.renderHeader && Dal.ui.renderHeader(); stopPolling(); if (!silent) toast('از حساب خود خارج شدید.', 'info'); if (/^#\/(dashboard|messages|new|edit|admin|favorites)/.test(location.hash)) location.hash = '#/'; };
   Dal.requireLogin = (msg = 'برای ادامه وارد حساب کاربری شوید.') => {
     if (Dal.state.user) return true;
     toast(msg, 'info'); sessionStorage.setItem('dal_next', location.hash || '#/'); location.hash = '#/login'; return false;

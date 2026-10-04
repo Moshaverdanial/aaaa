@@ -107,7 +107,7 @@
         on(body, 'click', '#cf-csv', async () => {
           const res = await fetch('/api/admin/contacts.csv', { headers: { Authorization: 'Bearer ' + Dal.token() } }).catch(() => null);
           if (!res || !res.ok) return Dal.toast('دریافت فایل ناموفق بود.', 'error');
-          const u = URL.createObjectURL(await res.blob()); const a = document.createElement('a'); a.href = u; a.download = 'dal-contacts.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(u), 3000);
+          Dal.download('dal-contacts.csv', await res.blob(), 'text/csv');
         });
         await load();
       },

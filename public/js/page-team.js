@@ -6,7 +6,7 @@
   const isLocalHost = () => /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1)/.test(location.hostname) || !location.hostname.includes('.');
   const copyText = async (t, ok = 'کپی شد ✅') => { try { await navigator.clipboard.writeText(t); } catch { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); } Dal.toast(ok, 'success'); };
   const qr = (text, size = 220, label = 'QR') => raw(Dal.qrSvg(text, { size, label, dark: '#0b1230', light: '#ffffff' }));
-  const download = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+  const download = (name, text, type) => Dal.download(name, text, type);
   const localWarn = () => isLocalHost() ? html`<p class="warn-note">${icon('alert', 16)} الان با آدرس شبکه‌ی داخلی (<b dir="ltr">${location.host}</b>) وارد شده‌اید؛ این لینک و QR فقط برای دستگاه‌های همین شبکه کار می‌کند. بعد از قراردادن سایت روی دامنه‌ی واقعی، برای همه کار می‌کند.</p>` : '';
 
   // ------------------------------------------------------------ QR برای هر لینک

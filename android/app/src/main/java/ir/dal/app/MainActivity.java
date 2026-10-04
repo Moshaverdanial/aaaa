@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(NAVY);
         setContentView(root);
 
+        debugHooks(getIntent());
         if (!buildWebView()) return;
         if (Prefs.server(this).isEmpty()) showSetup(null);
         else {
@@ -95,10 +96,19 @@ public class MainActivity extends Activity {
         }
     }
 
+    /** فقط در نسخه‌ی debug (برای آزمون خودکار): ورود با توکن از طریق intent. */
+    private void debugHooks(Intent in) {
+        if (BuildConfig.DEBUG && in != null && in.hasExtra("dbg_token")) {
+            Prefs.setToken(this, in.getStringExtra("dbg_token"));
+            PollJobService.schedule(this);
+        }
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        debugHooks(intent);
         if (web != null && !Prefs.server(this).isEmpty() && setupView == null) openSite(intent);
     }
 

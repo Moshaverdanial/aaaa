@@ -39,6 +39,7 @@ async function trim(cache) { if (trimming) return; trimming = true; try { const 
 self.addEventListener('fetch', (e) => {
   const req = e.request, u = new URL(req.url);
   if (req.method !== 'GET' || u.origin !== location.origin) return;
+  if (u.pathname === '/dal.apk' || u.pathname.startsWith('/api/cal/') || u.pathname.startsWith('/c/')) return;
   if (u.pathname.startsWith('/tiles/')) return e.respondWith(tileFirst(req));
   if (u.pathname.startsWith('/api/')) {
     if (!PUBLIC_API.test(u.pathname + (u.search ? '?' : ''))) return;

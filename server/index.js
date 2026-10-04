@@ -5,6 +5,7 @@ const path = require('node:path');
 const zlib = require('node:zlib');
 const crypto = require('node:crypto');
 const { q, DATA_DIR } = require('./db');
+const TEAM = require('./team');
 const U = require('./util');
 const { HttpError, str, clampInt, jparse } = U;
 const META = require('./meta');
@@ -882,7 +883,7 @@ put('/api/admin/reports/:id', ADMIN, (ctx) => { q.run('UPDATE reports SET status
 
 // ------------------------------------------------------------------ server
 // دفترچه‌ی دال (کمدها، ثبت‌ها و پیشنهاد هوشمند)
-require('./team').install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
+TEAM.install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
 require('./biz').install({ get, post, put, del, AUTH, AGENT, ADMIN, ip });
 require('./book').install({ get, post, put, del, AUTH, ADMIN, ip });
 
@@ -925,6 +926,17 @@ const server = http.createServer(async (req, res) => {
       const t = await TILES.getTile(tm[1], z, x, y);
       if (!t) throw new HttpError(404, 'کاشی در دسترس نیست.');
       return send(req, res, 200, t.buf, { 'Content-Type': 'image/png', 'Cache-Control': t.stale ? 'public, max-age=300' : 'public, max-age=604800' });
+    }
+    if (pathname === '/dal.apk') {
+      const f = TEAM.apkFile();
+      let st = null; try { st = fs.statSync(f); } catch { /* نیست */ }
+      if (!st || !st.isFile()) {
+        if (process.env.DAL_APK_URL) { res.writeHead(302, { Location: process.env.DAL_APK_URL }); return res.end(); }
+        throw new HttpError(404, 'فایل اپ اندروید روی این سرور نیست.');
+      }
+      res.writeHead(200, { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Disposition': 'attachment; filename="dal.apk"', 'Content-Length': st.size, 'Cache-Control': 'no-cache' });
+      if (req.method === 'HEAD') return res.end();
+      return fs.createReadStream(f).pipe(res);
     }
     if (pathname.startsWith('/uploads/')) {
       const f = path.join(UPLOADS, path.basename(pathname));

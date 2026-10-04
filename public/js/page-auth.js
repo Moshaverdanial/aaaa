@@ -16,7 +16,7 @@
     const b = m.body; const done = $('#rc-done', b);
     $('#rc-ok', b).onchange = (e) => { done.disabled = !e.target.checked; };
     $('#rc-copy', b).onclick = async () => { try { await navigator.clipboard.writeText(code); Dal.toast('کپی شد', 'success'); } catch { Dal.toast('کپی نشد؛ کد را دستی یادداشت کنید.', 'error'); } };
-    $('#rc-dl', b).onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([`کد بازیابی حساب دال\n${code}\n`], { type: 'text/plain' })); a.download = 'dal-recovery-code.txt'; a.click(); };
+    $('#rc-dl', b).onclick = () => { Dal.download('dal-recovery-code.txt', `کد بازیابی حساب دال\n${code}\n`, 'text/plain'); };
     done.onclick = () => { m.close(); resolve(); };
   });
 

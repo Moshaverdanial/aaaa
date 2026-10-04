@@ -197,6 +197,7 @@
 
   // share
   Dal.share = async (title, url = location.href) => {
+    if (Dal.isApp) { Dal.bridge('share', title, title + '\n' + url); return; }
     if (navigator.share) { try { await navigator.share({ title, url }); return; } catch { /* cancelled */ } }
     const enc = encodeURIComponent;
     const m = Dal.modal(html`<div class="share-grid">

@@ -34,7 +34,7 @@
         on(body, 'click', '[data-renew]', async (e, b) => { const r2 = await Dal.guard(() => Dal.api(`/listings/${b.dataset.renew}/renew`, { method: 'POST', body: {} }), b); if (r2) { Dal.toast('آگهی تمدید شد ✅', 'success'); T.listings(); } });
         on(body, 'click', '[data-st]', async (e, b) => { const r2 = await Dal.guard(() => Dal.api(`/listings/${b.dataset.id}/status`, { method: 'PUT', body: { status: b.dataset.st } }), b); if (r2) { Dal.toast(r2.status === 'pending' ? 'آگهی برای بررسی ارسال شد.' : 'وضعیت آگهی به‌روز شد ✅', 'success'); T.listings(); } });
         on(body, 'click', '[data-del]', async (e, b) => { if (await Dal.confirm('این آگهی حذف شود؟', { danger: true, ok: 'حذف' })) { await Dal.guard(() => Dal.api('/listings/' + b.dataset.del, { method: 'DELETE' })); T.listings(); } });
-        $('#csv', body)?.addEventListener('click', async () => { const res = await fetch('/api/my/listings.csv', { headers: { Authorization: 'Bearer ' + Dal.token() } }); const blob = await res.blob(); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'dal-listings.csv'; a.click(); });
+        $('#csv', body)?.addEventListener('click', async () => { const res = await fetch('/api/my/listings.csv', { headers: { Authorization: 'Bearer ' + Dal.token() } }); const blob = await res.blob(); Dal.download('dal-listings.csv', blob, 'text/csv'); });
       },
       async favorites() {
         const r = await Dal.api('/favorites'); if (!alive()) return;

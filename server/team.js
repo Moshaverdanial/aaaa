@@ -5,7 +5,9 @@
  *  ۳) گزارش هفتگی مدیر: لیدها، آگهی‌ها، معاملات، کمیسیون، ویژه‌سازی؛ خودکار هر هفته + دکمه‌ی «همین حالا»
  */
 const crypto = require('node:crypto');
-const { db, q } = require('./db');
+const fs = require('node:fs');
+const path = require('node:path');
+const { db, q, DATA_DIR } = require('./db');
 const U = require('./util');
 const { HttpError, str } = U;
 const META = require('./meta');
@@ -162,7 +164,15 @@ function start() {
 }
 
 // ------------------------------------------------------------------ مسیرها
+// فایل اپ اندروید: DAL_APK یا data/dal.apk (اگر نبود و DAL_APK_URL تنظیم بود، به آن می‌رود)
+const apkFile = () => process.env.DAL_APK || path.join(DATA_DIR, 'dal.apk');
+function apkInfo() {
+  try { const st = fs.statSync(apkFile()); if (st.isFile()) return { apk: true, url: '/dal.apk', size: st.size, updated: st.mtime.toISOString() }; } catch { /* نیست */ }
+  return process.env.DAL_APK_URL ? { apk: true, url: process.env.DAL_APK_URL, size: null, updated: null } : { apk: false, url: null, size: null, updated: null };
+}
+
 function install({ get, post, put, AUTH, AGENT, ADMIN, ip }) {
+  get('/api/app', () => apkInfo());
   get('/api/card/:id', (ctx) => cardData(ctx.params.id));
   get('/api/card/:id/vcard', (ctx) => ({ __raw: vcard(ctx.params.id), type: 'text/vcard; charset=utf-8', headers: { 'Content-Disposition': `attachment; filename="dal-${+ctx.params.id}.vcf"` } }));
   get('/api/me/card', AGENT, (ctx) => ({ cfg: cardCfg(ctx.user.id), agent: S.publicUser(ctx.user), id: ctx.user.id, phone: ctx.user.phone }));
@@ -184,4 +194,5 @@ function install({ get, post, put, AUTH, AGENT, ADMIN, ip }) {
   post('/api/admin/report/weekly/send', ADMIN, (ctx) => { if (!U.rateLimit('wk:' + ctx.user.id, 6, 3600e3)) throw new HttpError(429, 'کمی بعد تلاش کنید.'); return sendWeekly(); });
 }
 
-module.exports = { install, start, cardData, vcard, icsFor, dueFor, reminderJob, weeklyData, weeklyText, sendWeekly, tehran, addDays };
+module.exports = {
+  apkFile, apkInfo, install, start, cardData, vcard, icsFor, dueFor, reminderJob, weeklyData, weeklyText, sendWeekly, tehran, addDays };
