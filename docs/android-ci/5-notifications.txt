@@ -1,0 +1,9 @@
+    NotificationRecord(0x0ea788ad: pkg=ir.dal.app user=UserHandle{0} id=1 tag=null importance=3 key=0|ir.dal.app|1|null|10192: Notification(channel=dal_main shortcut=null contentView=null vibrate=null sound=null defaults=0x0 flags=0x10 color=0xff1f3a8a vis=PRIVATE))
+      icon=Icon(typ=RESOURCE pkg=ir.dal.app id=0x7f020003)
+                android.title=String (مشاور جدید در انتظار تأیید)
+                android.text=String (مشاور آزمایشی اعلان — پروانه‌ی 123456)
+                android.title=String (Serial console enabled)
+                android.text=String (Performance is impacted. To disable, check bootloader.)
+                android.title=String (Configure AT Translated Set 2 keyboard)
+                android.text=String (Tap to select language and layout)
+waiting

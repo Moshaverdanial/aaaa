@@ -1,0 +1,60 @@
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{cabd940 com.google.mainline.telemetry/10151} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{cabbe5 com.android.carrierconfig.auto_generated_rro_product__/10064} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{8dd3079 com.android.providers.partnerbookmarks/10100} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{188b1be com.android.wallpaper.livepicker/10090} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{4703161 com.android.providers.telephony.auto_generated_rro_product__/10062} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{4d6c486 com.android.phone.auto_generated_rro_vendor__/10081} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{44fc21f com.google.mainline.adservices/10136} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{615496c com.android.imsserviceentitlement/10117} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{8f75b35 com.google.android.healthconnect.controller/10180} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{34aa312 com.android.internal.emulation.pixel_2_xl/10016} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{6631ae3 com.android.internal.emulation.pixel_3_xl/10056} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{8f5cce0 com.android.internal.emulation.pixel_4_xl/10047} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{a54ab99 com.android.internal.emulation.pixel_fold/10006} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{f1a2bca com.android.bookmarkprovider/10115} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{8a2823f com.google.android.overlay.pixelconfigcommon/10014} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{c9ad70c com.android.systemui.accessibility.accessibilitymenu.auto_generated_rro_product__/10050} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{ae87a37 com.android.systemui.emulation.pixel_3a/10013} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{7c2fba4 com.android.systemui.emulation.pixel_4a/10000} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{b894d0d com.android.systemui.emulation.pixel_6a/10042} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{3fdf4c2 com.android.systemui.emulation.pixel_7a/10017} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{8bfc4f8 com.google.android.settings.intelligence/10118} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{7dd4465 com.google.android.projection.gearhead/10123} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{fb8613b com.google.android.uwb.resources/10177} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{db7d633 com.android.cts.ctsshim/10174} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{dc39058 com.google.android.wifi.resources/10187} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{e4f75b1 com.google.android.wifi.dialog/10189} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{5973a96 com.google.android.apps.wallpaper/10161} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{b41d617 com.google.android.odad/10122} BLOCKED
+10-04 02:34:25.687   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{f1155a5 com.android.settings.auto_generated_rro_product__/10028} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{517ed7a com.android.internal.systemui.navbar.gestural/10051} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{11fc714 com.google.android.apps.youtube.music/10156} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{70d5a04 com.android.bluetoothmidiservice/10107} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{7e6a721 com.android.storagemanager.auto_generated_rro_product__/10026} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{534bbed com.google.android.cellbroadcastreceiver/10176} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{6e27d07 com.android.phone.auto_generated_rro_product__/10061} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{af18e34 android.auto_generated_rro_product__/10069} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{265945d com.android.internal.systemui.navbar.gestural_narrow_back/10052} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{f046a22 com.google.android.inputmethod.latin/10140} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{79fe2a3 android.auto_generated_rro_vendor__/10075} BLOCKED
+10-04 02:34:25.688   520  2195 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{583bcb3 com.google.android.apps.restore/10119} BLOCKED
+10-04 02:34:25.815   520   551 I ActivityManager: Start proc 6452:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i1 for  {ir.dal.app/org.chromium.content.app.SandboxedProcessService0:0}
+10-04 02:34:25.877   520  2104 D ConnectivityService: requestNetwork for uid/pid:10192/6408 activeRequest: null callbackRequest: 163 [NetworkRequest [ REQUEST id=164, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+10-04 02:34:25.885   520   754 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=164, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-04 02:34:25.885   520   754 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=164, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-04 02:34:25.885   520   754 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=164, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-04 02:34:25.886   520   754 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=164, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-04 02:34:26.032   520  2195 D CoreBackPreview: Window{3af4c1d u0 ir.dal.app/ir.dal.app.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@e3edb24, mPriority=0, mIsAnimationCallback=false}
+10-04 02:34:26.415   520   537 W ziparchive: Unable to open '/data/app/~~G1vF1mjHyF91uEj_iKJVhQ==/ir.dal.app-kW4Wqcs6gNWH9gC1YH_UJg==/base.dm': No such file or directory
+10-04 02:34:26.417   520   537 I ActivityTaskManager: Displayed ir.dal.app/.MainActivity for user 0: +1s343ms
+10-04 02:34:26.426   520  1091 D CoreBackPreview: Window{f90f892 u0 Splash Screen ir.dal.app EXITING}: Setting back callback null
+10-04 02:34:26.426   520  1091 W InputManager-JNI: Input channel object 'f90f892 Splash Screen ir.dal.app (client)' was disposed without first being removed with the input manager!
+10-04 02:34:26.497   520  2195 I ImeTracker: ir.dal.app:ddb39d0c: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+10-04 02:34:26.497   520  2195 I ImeTracker: ir.dal.app:ddb39d0c: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-04 02:34:26.516  1562  1562 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x12000000 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=ir.dal.app fieldId=0 fieldName=null extras=null}, false)
+10-04 02:34:38.016  6621  6621 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-04 02:34:38.020  6621  6621 I AndroidRuntime: Using default boot image
+10-04 02:34:38.020  6621  6621 I AndroidRuntime: Leaving lock profiling enabled
+10-04 02:34:38.175  6621  6621 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-04 02:34:38.185   520   574 I AppsFilter: interaction: PackageSetting{f460ac8 ir.dal.app/10192} -> PackageSetting{483cadb com.google.android.contacts/10154} BLOCKED
+10-04 02:34:39.342  6621  6621 D AndroidRuntime: Shutting down VM
