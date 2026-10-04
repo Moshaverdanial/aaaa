@@ -98,7 +98,8 @@ jobs:
 
       - name: Save APK into the repository
         shell: bash
-        run: bash .github/ci/commit-back.sh "release/dal.apk: اپ اندروید دال نسخه‌ی 1.${{ github.run_number }}" release/dal.apk
+        run: |
+          bash .github/ci/commit-back.sh "release/dal.apk: اپ اندروید دال نسخه‌ی 1.${{ github.run_number }}" release/dal.apk
 
   smoke:
     needs: apk
@@ -161,4 +162,5 @@ jobs:
       - name: Save screenshots into the repository
         if: always()
         shell: bash
-        run: bash .github/ci/commit-back.sh "docs/android-ci: خروجی آزمون شبیه‌ساز" docs/android-ci
+        run: |
+          bash .github/ci/commit-back.sh "docs/android-ci: خروجی آزمون شبیه‌ساز" docs/android-ci

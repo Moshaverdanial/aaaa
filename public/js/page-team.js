@@ -89,11 +89,34 @@
       ios: ['حتماً با مرورگر <b>Safari</b> باز کنید (در کروم آیفون و تلگرام نصب نمی‌شود).', 'روی دکمه‌ی <b>اشتراک‌گذاری</b> (مربع با فلش رو به بالا، پایین صفحه) بزنید.', 'پایین بیایید و <b>«Add to Home Screen»</b> یا <b>«افزودن به صفحه‌ی اصلی»</b> را بزنید.', 'روی <b>Add</b> بزنید؛ دال مثل یک اپ کامل‌صفحه باز می‌شود.'],
       desktop: ['با <b>Chrome</b> یا <b>Edge</b> سایت را باز کنید.', 'در انتهای نوار آدرس، آیکن <b>نصب</b> (مانیتور با فلش) را بزنید؛ یا منوی ⋮ ← <b>Install Dal</b>.', 'روی <b>Install</b> بزنید؛ دال در پنجره‌ی مستقل و با آیکن روی دسکتاپ و منوی استارت نصب می‌شود.', 'در مک با Safari: منوی File ← <b>Add to Dock</b>.'],
     };
+    let appInfo = { apk: false };
+    try { appInfo = await Dal.api('/app'); } catch { /* سرور قدیمی */ }
+    const sizeTxt = appInfo.size ? ` (${(appInfo.size / 1048576).toFixed(1).replace('.', '٫')} مگابایت)` : '';
+    // ---- داخل خودِ اپ اندروید
+    if (Dal.isApp) {
+      const paint = () => mount(app, html`<div class="container section install-page">
+        <header class="lead-hero"><div><span class="book-kicker">${icon('checkc', 16)} اپ اندروید دال نصب است</span><h1>تنظیمات اپ اندروید</h1><p>نسخه‌ی اپ: <b dir="ltr">${Dal.bridge('version')}</b></p></div></header>
+        <div class="grid g2 mt-lg">
+          <div class="panel" style="margin:0"><h3>${icon('bell', 22)} اعلان‌های گوشی</h3><p class="muted">یادآور پیگیری‌ها، پیام‌ها و گزارش‌ها حتی وقتی اپ بسته است به‌صورت اعلان می‌آید (هر چند دقیقه یک‌بار بررسی می‌شود). ${Dal.bridge('notificationsEnabled') ? html`<span class="pill ok">فعال</span>` : html`<span class="pill">غیرفعال</span>`}</p>
+            <button class="btn gold" id="app-notif">${icon('bell', 16)} تنظیم اعلان‌ها</button>
+            <p class="warn-note">در بعضی گوشی‌ها (شیائومی، سامسونگ، هوآوی…) حالت «صرفه‌جویی باتری» اعلان‌های پس‌زمینه را دیر می‌کند؛ در تنظیمات گوشی برای «دال» محدودیت باتری را بردارید.</p></div>
+          <div class="panel" style="margin:0"><h3>${icon('settings', 22)} سرور</h3><p class="muted">آدرس سایت: <b dir="ltr">${Dal.bridge('server')}</b></p>
+            <button class="btn ghost" id="app-srv">تغییر آدرس سرور</button><p class="muted" style="font-size:13px">اگر آدرس سایت عوض شد، از اینجا آدرس جدید را بدهید.</p></div>
+        </div></div>`);
+      paint();
+      on(app, 'click', '#app-notif', () => { Dal.bridge('enableNotifications'); setTimeout(paint, 1500); });
+      on(app, 'click', '#app-srv', () => Dal.bridge('changeServer'));
+      return;
+    }
+    const apkPanel = () => appInfo.apk ? html`<div class="panel apk-panel"><div class="apk-top"><div><h3>${icon('phone', 22)} اپ اندروید دال (فایل APK)</h3><p class="muted">اپ واقعی اندروید با اعلان پیگیری‌ها روی گوشی، انتخاب عکس، دانلود فایل و اشتراک‌گذاری. بدون نیاز به گوگل‌پلی.</p></div>
+        <a class="btn gold lg" href="${appInfo.url}" download>${icon('send', 20)} دانلود اپ اندروید${sizeTxt}</a></div>
+        <details class="steps-box"><summary><b>مراحل نصب فایل APK</b></summary><ol><li>روی «دانلود اپ اندروید» بزنید و صبر کنید فایل <b dir="ltr">dal.apk</b> دانلود شود.</li><li>فایل را از اعلان دانلود یا پوشه‌ی Downloads باز کنید.</li><li>اگر گوشی پرسید «Install unknown apps / نصب از منابع ناشناس»، اجازه را برای همین مرورگر روشن کنید.</li><li>روی <b>Install</b> بزنید. اگر Play Protect هشدار داد، «Install anyway» را بزنید (چون اپ از فروشگاه نیست).</li><li>اگر اپ آدرس سایت را پرسید، همین آدرس را بزنید: <b dir="ltr">${origin()}</b></li></ol></details></div>` : '';
     const draw = () => mount(app, html`<div class="container section install-page">
       <header class="lead-hero"><div><span class="book-kicker">${icon('zap', 16)} بدون فروشگاه اپ، رایگان</span><h1>دال را روی گوشی و کامپیوتر نصب کنید</h1><p>دال یک وب‌اپ نصب‌شدنی (PWA) است: آیکن روی صفحه‌ی اصلی، باز شدن تمام‌صفحه و بدون نوار مرورگر، و سریع‌تر از سایت معمولی. روی اندروید، آیفون، ویندوز، مک و لینوکس کار می‌کند.</p></div>
         ${standalone ? html`<span class="pill ok" style="font-size:15px">${icon('checkc', 18)} همین الان به‌صورت اپ نصب‌شده باز است</span>` : (Dal.installEvt ? html`<button class="btn gold lg" id="do-install">${icon('plus', 20)} نصب همین حالا</button>` : '')}</header>
       ${inApp ? html`<div class="panel warn-panel">${icon('alert', 22)}<div><b>الان داخل مرورگر یک برنامه (تلگرام، اینستاگرام، ایتا…) هستید.</b><p class="muted">این مرورگرها اجازه‌ی نصب نمی‌دهند. روی منوی ⋮ بزنید و «Open in browser» / «باز کردن در مرورگر» را انتخاب کنید، یا لینک را در Chrome یا Safari بچسبانید.</p></div></div>` : ''}
       ${!isSecureContext && !isLocalHost() ? html`<div class="panel warn-panel">${icon('alert', 22)}<div><b>این آدرس https نیست.</b><p class="muted">مرورگرها نصب اپ را فقط روی https (یا localhost) اجازه می‌دهند. با Caddy و دامنه، https خودکار می‌شود (راهنما در README).</p></div></div>` : ''}
+      ${apkPanel()}
       <div class="lead-grid mt-lg"><div>
         <div class="tabs sm" id="plat">${Object.entries(T).map(([k, v]) => html`<a class="tab ${k === me ? 'on' : ''}" data-p="${k}">${v}${k === me ? ' (دستگاه شما)' : ''}</a>`)}</div>
         <div id="steps" class="panel mt" style="margin-bottom:0"></div></div>

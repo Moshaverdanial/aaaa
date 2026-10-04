@@ -640,3 +640,4 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shado
 }
 
 .warn-note > svg { display: inline-block; vertical-align: -3px; margin-inline-end: 6px; }
+.apk-panel { border-color: rgba(230, 199, 111, .55) !important; margin: 14px 0; } .apk-top { display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; } .apk-top > div { flex: 1; min-width: 240px; } .apk-top h3 { margin: 0 0 6px; }
