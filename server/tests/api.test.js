@@ -504,3 +504,11 @@ test('QR: ماتریس معتبر با الگوی یابنده و خطای مت�
   assert.match(qrSvg('x', { size: 200 }), /^<svg/);
   assert.throws(() => qrMatrix('x'.repeat(400)));
 });
+
+test('اپ اندروید: /api/app بدون فایل خاموش است و /dal.apk ۴۰۴ می‌دهد', async () => {
+  const r = await call('/app');
+  assert.equal(r.status, 200);
+  assert.equal(r.data.apk, false);
+  const f = await fetch(base.replace(/\/api$/, '') + '/dal.apk');
+  assert.equal(f.status, 404);
+});

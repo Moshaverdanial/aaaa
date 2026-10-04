@@ -37,6 +37,9 @@ if [ -z "$NODE_BIN" ]; then
 fi
 
 install -m 0644 "$DAL_JS" "$APP/dal.js"
+# اپ اندروید (اختیاری): اگر dal.apk کنار dal.js بود، سرور آن را در /dal.apk برای دانلود می‌گذارد
+APK_SRC="$(dirname "$DAL_JS")/dal.apk"
+if [ -f "$APK_SRC" ]; then install -m 0644 "$APK_SRC" "$APP/data/dal.apk"; echo "فایل اپ اندروید نصب شد: /dal.apk"; fi
 chown -R dal:dal "$APP"
 SRC="$(dirname "$0")/dal.service"; [ -f "$SRC" ] || SRC="$(dirname "$DAL_JS")/deploy/dal.service"
 if [ -f "$SRC" ]; then sed "s#/opt/dal/node/bin/node#$NODE_BIN#" "$SRC" > /etc/systemd/system/dal.service
