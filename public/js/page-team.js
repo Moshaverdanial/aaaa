@@ -91,7 +91,7 @@
     };
     let appInfo = { apk: false };
     try { appInfo = await Dal.api('/app'); } catch { /* سرور قدیمی */ }
-    const sizeTxt = appInfo.size ? ` (${(appInfo.size / 1048576).toFixed(1).replace('.', '٫')} مگابایت)` : '';
+    const sizeTxt = appInfo.size ? (appInfo.size < 1048576 ? ` (${num(Math.round(appInfo.size / 1024))} کیلوبایت)` : ` (${num(+(appInfo.size / 1048576).toFixed(1))} مگابایت)`) : '';
     // ---- داخل خودِ اپ اندروید
     if (Dal.isApp) {
       const paint = () => mount(app, html`<div class="container section install-page">

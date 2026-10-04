@@ -17,8 +17,8 @@ sleep 1; adb shell input text "10.0.2.2:3000"; sleep 1; adb shell input keyevent
 sleep 25; shot 2-home
 
 TOKEN=$(cat "$RUNNER_TEMP/token")
-adb shell am start -n ir.dal.app/.MainActivity --es link "#/install" ; sleep 8; shot 3-install
-adb shell am start -n ir.dal.app/.MainActivity --es link "#/search" ; sleep 8; shot 4-search
+adb shell "am start -n ir.dal.app/.MainActivity --es link '#/install'"; sleep 8; shot 3-install
+adb shell "am start -n ir.dal.app/.MainActivity --es link '#/search'"; sleep 8; shot 4-search
 
 # اعلان‌ها: ورود با توکن مدیر، نقطه‌ی شروع، ساخت رویداد در سرور، اجرای دوباره‌ی کار
 adb shell am start -n ir.dal.app/.MainActivity --es dbg_token "$TOKEN"; sleep 4

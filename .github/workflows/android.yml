@@ -157,7 +157,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          { cat docs/android-ci/5-notifications.txt 2>/dev/null; echo ---; cat docs/android-ci/logcat.txt 2>/dev/null | tail -25; echo ---; grep -o 'text="[^"]\{2,40\}"' docs/android-ci/2-home.xml 2>/dev/null | head -25; } | bash .github/ci/notice.sh "Emulator results"
+          { cat docs/android-ci/5-notifications.txt 2>/dev/null; echo ---; cat docs/android-ci/logcat.txt 2>/dev/null | tail -25; echo ---; grep -o 'text="[^"]\{2,40\}"' docs/android-ci/3-install.xml 2>/dev/null | head -25 || true; } | bash .github/ci/notice.sh "Emulator results"
 
       - name: Save screenshots into the repository
         if: always()

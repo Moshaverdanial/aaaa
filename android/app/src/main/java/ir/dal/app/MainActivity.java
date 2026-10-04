@@ -27,6 +27,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
@@ -392,6 +393,7 @@ public class MainActivity extends Activity {
         setupView = box;
         root.addView(box, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         web.setVisibility(View.INVISIBLE);
+        input.requestFocus();
     }
 
     private void hideSetup() {
@@ -449,6 +451,8 @@ public class MainActivity extends Activity {
                             err.setText("به این آدرس وصل نشدیم یا دال نیست. آدرس را بدون خطا و با اینترنت روشن بررسی کنید.");
                             return;
                         }
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (imm != null) imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
                         Prefs.setServer(MainActivity.this, f);
                         Prefs.setToken(MainActivity.this, "");
                         PollJobService.cancel(MainActivity.this);
