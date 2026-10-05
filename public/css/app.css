@@ -641,3 +641,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shado
 
 .warn-note > svg { display: inline-block; vertical-align: -3px; margin-inline-end: 6px; }
 .apk-panel { border-color: rgba(230, 199, 111, .55) !important; margin: 14px 0; } .apk-top { display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; } .apk-top > div { flex: 1; min-width: 240px; } .apk-top h3 { margin: 0 0 6px; }
+
+/* موبایل: منوهای بازشو (اعلان‌ها، حساب) هیچ‌وقت از عرض صفحه بیرون نزنند؛ قبلاً با ورود به حساب صفحه افقی کش می‌آمد */
+@media (max-width: 760px) {
+  .dd-menu, .dd-menu.notif { position: fixed; top: 66px; left: 10px; right: 10px; inset-inline-start: 10px; inset-inline-end: 10px; width: auto; min-width: 0; max-width: none; max-height: 72vh; }
+}
+body { overflow-x: clip; }

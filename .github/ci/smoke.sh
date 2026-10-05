@@ -52,7 +52,14 @@ adb shell am start -n ir.dal.app/.MainActivity; sleep 12; shot 6-offline
 # سرور دوباره روشن می‌شود؛ دکمه‌ی «تلاش دوباره» باید سایت را برگرداند
 (PORT=3000 DAL_DATA_DIR="$RUNNER_TEMP/dal" nohup node server/index.js > "$RUNNER_TEMP/server2.log" 2>&1 &)
 sleep 5
-adb shell input tap 540 1489
+ALIVE=$(adb shell pidof ir.dal.app | tr -d '\r')
+if [ -z "$ALIVE" ]; then
+  echo "اپ پیش از دکمه‌ی تلاش دوباره توسط سیستم بسته شده بود (ناپایداری شبیه‌ساز)؛ دوباره اجرا می‌شود" > $OUT/8-note.txt
+  adb shell am start -n ir.dal.app/.MainActivity; sleep 12
+else
+  echo "اپ زنده بود؛ دکمه‌ی تلاش دوباره زده شد" > $OUT/8-note.txt
+  adb shell input tap 540 1489
+fi
 sleep 12; shot 8-recovered
 
 adb logcat -d | grep -E "AndroidRuntime|FATAL|ir.dal.app" | tail -60 > $OUT/logcat.txt || true
