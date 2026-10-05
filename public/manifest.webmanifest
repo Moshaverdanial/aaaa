@@ -1,0 +1,76 @@
+{
+  "name": "دال — املاک آنلاین",
+  "short_name": "دال",
+  "description": "هوشمندترین پلتفرم املاک ایران",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1230",
+  "theme_color": "#0b1230",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "id": "/",
+  "scope": "/",
+  "categories": [
+    "business",
+    "lifestyle"
+  ],
+  "orientation": "portrait-primary",
+  "shortcuts": [
+    {
+      "name": "دفترچه‌ی دال",
+      "url": "/#/book",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "ملکت را بسپار",
+      "url": "/#/sell",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "میزکار معاملات",
+      "url": "/#/deals",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

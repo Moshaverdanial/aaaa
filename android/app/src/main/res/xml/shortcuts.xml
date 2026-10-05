@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut android:shortcutId="search" android:enabled="true" android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/sc_search" android:shortcutLongLabel="@string/sc_search_long">
+        <intent android:action="android.intent.action.MAIN" android:targetPackage="ir.dal.app" android:targetClass="ir.dal.app.MainActivity">
+            <extra android:name="link" android:value="#/search" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="new" android:enabled="true" android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/sc_new" android:shortcutLongLabel="@string/sc_new_long">
+        <intent android:action="android.intent.action.MAIN" android:targetPackage="ir.dal.app" android:targetClass="ir.dal.app.MainActivity">
+            <extra android:name="link" android:value="#/new" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="deals" android:enabled="true" android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/sc_deals" android:shortcutLongLabel="@string/sc_deals_long">
+        <intent android:action="android.intent.action.MAIN" android:targetPackage="ir.dal.app" android:targetClass="ir.dal.app.MainActivity">
+            <extra android:name="link" android:value="#/deals" />
+        </intent>
+    </shortcut>
+    <shortcut android:shortcutId="book" android:enabled="true" android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/sc_book" android:shortcutLongLabel="@string/sc_book_long">
+        <intent android:action="android.intent.action.MAIN" android:targetPackage="ir.dal.app" android:targetClass="ir.dal.app.MainActivity">
+            <extra android:name="link" android:value="#/book" />
+        </intent>
+    </shortcut>
+</shortcuts>

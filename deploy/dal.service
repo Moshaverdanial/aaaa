@@ -1,0 +1,26 @@
+# systemd: کپی در /etc/systemd/system/dal.service  سپس  systemctl enable --now dal
+[Unit]
+Description=Dal real-estate platform
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/dal
+# اگر Node را سیستمی نصب کرده‌اید مسیر را به /usr/bin/node تغییر دهید
+ExecStart=/opt/dal/node/bin/node --no-warnings /opt/dal/dal.js
+Environment=PORT=3000
+# رفتن پشت nginx/Caddy؟ این را روشن کنید تا IP واقعی کاربر خوانده شود:
+# Environment=TRUST_PROXY=1
+Environment=DAL_BASE_URL=https://example.ir
+EnvironmentFile=-/opt/dal/data/.env
+Restart=always
+RestartSec=3
+User=dal
+Group=dal
+NoNewPrivileges=true
+ProtectSystem=full
+ReadWritePaths=/opt/dal
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دال</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b1230;color:#fff;font-family:sans-serif}
+  body{display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;
+    background:radial-gradient(120% 80% at 80% 0%,#2a4cb8 0%,#1f3a8a 35%,#0b1230 100%)}
+  .box{max-width:420px;width:100%;text-align:center}
+  .logo{width:84px;height:84px;margin:0 auto 18px;border-radius:24px;border:2px solid #e6c76f;display:flex;align-items:center;justify-content:center;font-size:48px;color:#e6c76f;font-weight:bold}
+  h1{margin:0 0 8px;font-size:24px;color:#e6c76f}
+  p{margin:8px 0;line-height:2;color:#dfe5ff;font-size:15px}
+  code{direction:ltr;unicode-bidi:embed;background:rgba(255,255,255,.1);padding:2px 8px;border-radius:8px;font-size:13px;word-break:break-all}
+  button{display:block;width:100%;margin:12px 0 0;padding:14px;border-radius:14px;border:0;font-size:16px;font-weight:bold;cursor:pointer}
+  .p{background:linear-gradient(135deg,#f0d98c,#b88a2a);color:#1b1405}
+  .g{background:transparent;border:1px solid rgba(230,199,111,.6);color:#e6c76f}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">د</div>
+  <h1>اتصال برقرار نشد</h1>
+  <p>اینترنت گوشی را بررسی کنید. اگر سرور دال خاموش است یا آدرس عوض شده، می‌توانید آدرس را تغییر دهید.</p>
+  <p>آدرس فعلی: <code id="srv">-</code></p>
+  <button class="p" onclick="DalAndroid.retry()">تلاش دوباره</button>
+  <button class="g" onclick="DalAndroid.changeServer()">تغییر آدرس سرور</button>
+</div>
+<script>try{document.getElementById('srv').textContent=DalAndroid.server()}catch(e){}</script>
+</body>
+</html>
