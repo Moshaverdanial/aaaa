@@ -11,3 +11,4 @@ release/data/
 data/backups/
 data/tiles/
 data/.env
+__pycache__/

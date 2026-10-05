@@ -5,6 +5,12 @@ plugins {
 // آدرس پیش‌فرض سرور (اختیاری): ./gradlew assembleRelease -PdalServer=https://dal.example.ir
 // اگر خالی باشد، اپ در اولین اجرا آدرس سرور را می‌پرسد.
 def dalServer = (project.findProperty('dalServer') ?: '').toString().trim()
+// میزبان آدرس سرور: لینک‌های این میزبان (آگهی، کارت ویزیت…) در اپ باز می‌شوند
+def dalHost = 'dal.invalid'
+try {
+    def h = dalServer ? new URI(dalServer).host : null
+    if (h) dalHost = h
+} catch (Exception ignored) { }
 def dalVersionCode = (project.findProperty('dalVersionCode') ?: '1').toString().toInteger()
 def dalVersionName = (project.findProperty('dalVersionName') ?: '1.0').toString()
 
@@ -18,6 +24,7 @@ android {
         targetSdk 34
         versionCode dalVersionCode
         versionName dalVersionName
+        manifestPlaceholders = [dalHost: dalHost]
         buildConfigField 'String', 'DEFAULT_SERVER', '"' + dalServer.replace('"', '') + '"'
     }
 

@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">دال</string>
+    <string name="sc_search">جستجو</string>
+    <string name="sc_search_long">جستجوی ملک</string>
+    <string name="sc_new">ثبت آگهی</string>
+    <string name="sc_new_long">ثبت آگهی تازه</string>
+    <string name="sc_deals">معاملات</string>
+    <string name="sc_deals_long">میزکار معاملات</string>
+    <string name="sc_book">دفترچه</string>
+    <string name="sc_book_long">دفترچه‌ی دال</string>
 </resources>

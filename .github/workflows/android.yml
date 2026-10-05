@@ -61,7 +61,7 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk out/dal.apk
           cp out/dal.apk release/dal.apk
           BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
-          { ls -la out/dal.apk; "$BT/aapt2" dump badging out/dal.apk | grep -E "^package|application-label:|sdkVersion|uses-permission|launchable" ; "$BT/apksigner" verify --verbose --print-certs out/dal.apk 2>&1 | head -8; } | bash .github/ci/notice.sh "APK info"
+          { ls -la out/dal.apk; "$BT/aapt2" dump badging out/dal.apk | grep -E "^package|application-label:|sdkVersion|uses-permission|launchable" ; "$BT/apksigner" verify --verbose --print-certs out/dal.apk 2>&1 | head -4; "$BT/aapt2" dump xmltree out/dal.apk --file AndroidManifest.xml | grep -E "host|scheme|shortcuts" ; unzip -l out/dal.apk | grep -E "shortcuts|offline"; } | bash .github/ci/notice.sh "APK info"
 
       - name: Show build errors as annotation
         if: failure()
@@ -137,6 +137,10 @@ jobs:
           for i in $(seq 1 30); do curl -sf localhost:3000/api/health && break; sleep 1; done
           curl -s -XPOST localhost:3000/api/auth/login -H 'content-type: application/json' -d '{"phone":"09120000001","password":"Admin12345"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['token'])" > "$RUNNER_TEMP/token"
 
+      - name: Install CDP client
+        shell: bash
+        run: npm i --prefix "$RUNNER_TEMP/cdp" ws --no-audit --no-fund
+
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -157,7 +161,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          { cat docs/android-ci/5-notifications.txt 2>/dev/null; echo ---; cat docs/android-ci/logcat.txt 2>/dev/null | tail -25; echo ---; grep -o 'text="[^"]\{2,40\}"' docs/android-ci/3-install.xml 2>/dev/null | head -25 || true; } | bash .github/ci/notice.sh "Emulator results"
+          { cat docs/android-ci/7-cdp.txt 2>/dev/null; echo ---; cat docs/android-ci/5-notifications.txt 2>/dev/null; echo ---; cat docs/android-ci/logcat.txt 2>/dev/null | tail -25; echo ---; grep -o 'text="[^"]\{2,40\}"' docs/android-ci/3-install.xml 2>/dev/null | head -25 || true; } | bash .github/ci/notice.sh "Emulator results"
 
       - name: Save screenshots into the repository
         if: always()

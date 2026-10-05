@@ -75,6 +75,10 @@
     });
   };
 
+  // رنگ نوار وضعیت و ناوبری اپ اندروید با تم سایت یکی می‌شود
+  Dal.syncBars = () => { if (!Dal.isApp) return; const dark = document.documentElement.dataset.theme !== 'light'; Dal.bridge('setBars', dark ? '#0b1230' : '#f6f1e6', dark); };
+  document.addEventListener('dal:theme', Dal.syncBars); Dal.syncBars();
+
   // ------------------------------------------------------------ نصب اپ روی همه‌ی دستگاه‌ها
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); Dal.installEvt = e; if (Dal.onInstallReady) Dal.onInstallReady(); });
   window.addEventListener('appinstalled', () => { Dal.installEvt = null; Dal.toast('دال نصب شد', 'success'); });
@@ -102,10 +106,14 @@
             <p class="warn-note">در بعضی گوشی‌ها (شیائومی، سامسونگ، هوآوی…) حالت «صرفه‌جویی باتری» اعلان‌های پس‌زمینه را دیر می‌کند؛ در تنظیمات گوشی برای «دال» محدودیت باتری را بردارید.</p></div>
           <div class="panel" style="margin:0"><h3>${icon('settings', 22)} سرور</h3><p class="muted">آدرس سایت: <b dir="ltr">${Dal.bridge('server')}</b></p>
             <button class="btn ghost" id="app-srv">تغییر آدرس سرور</button><p class="muted" style="font-size:13px">اگر آدرس سایت عوض شد، از اینجا آدرس جدید را بدهید.</p></div>
+          <div class="panel" style="margin:0"><h3>${icon('lock', 22)} قفل برنامه</h3><p class="muted">دفترچه و پرونده‌ها اطلاعات مشتری‌هاست. با روشن‌کردن قفل، بعد از یک دقیقه دور بودن از اپ، دوباره پین، الگو یا اثرانگشت گوشی پرسیده می‌شود و عکس‌گرفتن از صفحه هم بسته می‌شود. ${Dal.bridge('lockEnabled') ? html`<span class="pill ok">روشن</span>` : html`<span class="pill">خاموش</span>`}</p>
+            <button class="btn ${Dal.bridge('lockEnabled') ? 'ghost' : 'gold'}" id="app-lock">${icon('lock', 16)} ${Dal.bridge('lockEnabled') ? 'خاموش‌کردن قفل' : 'روشن‌کردن قفل'}</button></div>
+          <div class="panel" style="margin:0"><h3>${icon('zap', 22)} میان‌برها</h3><p class="muted">روی آیکن دال در صفحه‌ی اصلی گوشی انگشت را نگه دارید: جستجو، ثبت آگهی، معاملات و دفترچه یک لمس فاصله دارند. کشیدن صفحه به پایین از بالای صفحه، آن را بازخوانی می‌کند. لینک آگهی‌ها و کارت‌های دال هم اگر با این اپ باز شوند، داخل اپ نشان داده می‌شوند.</p></div>
         </div></div>`);
       paint();
       on(app, 'click', '#app-notif', () => { Dal.bridge('enableNotifications'); setTimeout(paint, 1500); });
       on(app, 'click', '#app-srv', () => Dal.bridge('changeServer'));
+      on(app, 'click', '#app-lock', () => { Dal.bridge('setLock', !Dal.bridge('lockEnabled')); setTimeout(paint, 400); });
       return;
     }
     const apkPanel = () => appInfo.apk ? html`<div class="panel apk-panel"><div class="apk-top"><div><h3>${icon('phone', 22)} اپ اندروید دال (فایل APK)</h3><p class="muted">اپ واقعی اندروید با اعلان پیگیری‌ها روی گوشی، انتخاب عکس، دانلود فایل و اشتراک‌گذاری. بدون نیاز به گوگل‌پلی.</p></div>

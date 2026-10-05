@@ -40,4 +40,12 @@ final class Prefs {
     static void setLastId(Context c, long id) {
         sp(c).edit().putLong("lastId", id).apply();
     }
+
+    static boolean lock(Context c) {
+        return sp(c).getBoolean("lock", false);
+    }
+
+    static void setLock(Context c, boolean on) {
+        sp(c).edit().putBoolean("lock", on).apply();
+    }
 }

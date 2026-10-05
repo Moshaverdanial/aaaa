@@ -3,6 +3,7 @@ package ir.dal.app;
 import android.Manifest;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -13,6 +14,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,6 +27,8 @@ import android.provider.Settings;
 import android.text.InputType;
 import android.util.Base64;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.WindowManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -65,6 +70,7 @@ public class MainActivity extends Activity {
     private static final int REQ_FILE = 11;
     private static final int REQ_LOC = 12;
     private static final int REQ_NOTIF = 13;
+    private static final int REQ_UNLOCK = 14;
     private static final int NAVY = 0xFF0B1230;
     private static final int GOLD = 0xFFE6C76F;
 
@@ -77,6 +83,12 @@ public class MainActivity extends Activity {
     private GeolocationPermissions.Callback geoCb;
     private String geoOrigin;
     private String failedUrl = "";
+    private boolean offlineShown = false;
+    private long lastBack = 0;
+    private long pausedAt = 0;
+    private boolean suppressLock = false;
+    private View lockView;
+    private ConnectivityManager.NetworkCallback netCb;
 
     // ------------------------------------------------------------------ چرخه‌ی عمر
     @Override
@@ -89,11 +101,22 @@ public class MainActivity extends Activity {
         setContentView(root);
 
         debugHooks(getIntent());
+        if (Prefs.lock(this)) getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         if (!buildWebView()) return;
+        watchNetwork();
         if (Prefs.server(this).isEmpty()) showSetup(null);
         else {
             openSite(getIntent());
             if (!Prefs.token(this).isEmpty()) PollJobService.schedule(this);
+        }
+        if (Prefs.lock(this) && deviceSecure()) {
+            showLock();
+            ui.post(new Runnable() {
+                @Override
+                public void run() {
+                    askUnlock();
+                }
+            });
         }
     }
 
@@ -119,13 +142,22 @@ public class MainActivity extends Activity {
             hideSetup();
             return;
         }
-        if (web != null && setupView == null && web.canGoBack()) web.goBack();
-        else super.onBackPressed();
+        if (web != null && setupView == null && web.canGoBack()) {
+            web.goBack();
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - lastBack < 2000) super.onBackPressed();
+        else {
+            lastBack = now;
+            toast("برای خروج یک بار دیگر «بازگشت» را بزنید.");
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        pausedAt = System.currentTimeMillis();
         if (web != null) web.onPause();
     }
 
@@ -133,10 +165,22 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (web != null) web.onResume();
+        if (Prefs.lock(this) && deviceSecure() && lockView == null && !suppressLock && pausedAt > 0
+                && System.currentTimeMillis() - pausedAt > 60000) {
+            showLock();
+            askUnlock();
+        }
     }
 
     @Override
     protected void onDestroy() {
+        if (netCb != null) {
+            try {
+                ((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).unregisterNetworkCallback(netCb);
+            } catch (Exception ignored) {
+                // هیچ
+            }
+        }
         if (web != null) {
             web.stopLoading();
             web.destroy();
@@ -175,6 +219,31 @@ public class MainActivity extends Activity {
             s.setForceDark(WebSettings.FORCE_DARK_OFF); // دال تم تیره/روشن خودش را دارد
         }
         web.addJavascriptInterface(new Bridge(), "DalAndroid");
+        if (BuildConfig.DEBUG) WebView.setWebContentsDebuggingEnabled(true);
+        web.setOnTouchListener(new View.OnTouchListener() {
+            private float startY = 0;
+            private boolean armed = false;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent e) {
+                switch (e.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startY = e.getY();
+                        armed = web.getScrollY() == 0 && e.getY() < dp(150);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        if (armed && e.getY() - startY > dp(130)) {
+                            armed = false;
+                            toast("در حال بازخوانی…");
+                            retryNow();
+                        }
+                        break;
+                    default:
+                        armed = false;
+                }
+                return false;
+            }
+        });
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -184,6 +253,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageStarted(WebView v, String url, android.graphics.Bitmap icon) {
+                if (url == null || !url.startsWith("file:///android_asset/")) offlineShown = false;
                 bar.setVisibility(View.VISIBLE);
             }
 
@@ -196,6 +266,7 @@ public class MainActivity extends Activity {
             public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) {
                 if (r.isForMainFrame()) {
                     failedUrl = r.getUrl().toString();
+                    offlineShown = true;
                     v.loadUrl("file:///android_asset/offline.html");
                 }
             }
@@ -212,6 +283,7 @@ public class MainActivity extends Activity {
             public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams p) {
                 if (fileCb != null) fileCb.onReceiveValue(null);
                 fileCb = cb;
+                suppressLock = true;
                 try {
                     startActivityForResult(p.createIntent(), REQ_FILE);
                 } catch (Exception e) {
@@ -499,7 +571,12 @@ public class MainActivity extends Activity {
     // ------------------------------------------------------------------ نتیجه‌ی اجازه‌ها و انتخاب فایل
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
+        if (req == REQ_UNLOCK) {
+            if (res == RESULT_OK) hideLock();
+            return;
+        }
         if (req == REQ_FILE) {
+            suppressLock = false;
             if (fileCb != null) {
                 fileCb.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(res, data));
                 fileCb = null;
@@ -519,6 +596,120 @@ public class MainActivity extends Activity {
             return;
         }
         super.onRequestPermissionsResult(req, perms, results);
+    }
+
+    // ------------------------------------------------------------------ قفل برنامه، شبکه، نوار وضعیت
+    private boolean deviceSecure() {
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        return km != null && km.isDeviceSecure();
+    }
+
+    private void showLock() {
+        if (lockView != null || root == null) return;
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER);
+        box.setBackgroundColor(NAVY);
+        box.setClickable(true);
+        TextView logo = new TextView(this);
+        logo.setText("د");
+        logo.setTextColor(GOLD);
+        logo.setTextSize(46);
+        logo.setTypeface(Typeface.DEFAULT_BOLD);
+        logo.setGravity(Gravity.CENTER);
+        GradientDrawable ring = new GradientDrawable();
+        ring.setCornerRadius(dp(24));
+        ring.setStroke(dp(2), GOLD);
+        logo.setBackground(ring);
+        box.addView(logo, new LinearLayout.LayoutParams(dp(88), dp(88)));
+        TextView t = text("دال قفل است", 20, GOLD, true);
+        t.setPadding(0, dp(16), 0, dp(14));
+        box.addView(t);
+        Button b = new Button(this);
+        b.setText("باز کردن قفل");
+        b.setAllCaps(false);
+        b.setTextColor(0xFF1B1405);
+        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{0xFFF0D98C, 0xFFB88A2A});
+        bg.setCornerRadius(dp(14));
+        b.setBackground(bg);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                askUnlock();
+            }
+        });
+        box.addView(b, new LinearLayout.LayoutParams(dp(220), dp(50)));
+        lockView = box;
+        root.addView(box, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void hideLock() {
+        if (lockView != null) {
+            root.removeView(lockView);
+            lockView = null;
+        }
+    }
+
+    private void askUnlock() {
+        try {
+            KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+            Intent i = km == null ? null : km.createConfirmDeviceCredentialIntent("دال", "برای ادامه، قفل گوشی را وارد کنید");
+            if (i == null) hideLock();
+            else startActivityForResult(i, REQ_UNLOCK);
+        } catch (Exception e) {
+            hideLock();
+        }
+    }
+
+    private void watchNetwork() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            netCb = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network n) {
+                    ui.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (offlineShown && setupView == null) retryNow();
+                        }
+                    });
+                }
+            };
+            cm.registerDefaultNetworkCallback(netCb);
+        } catch (Exception e) {
+            netCb = null;
+        }
+    }
+
+    private void retryNow() {
+        if (offlineShown) {
+            String u = failedUrl;
+            if (u == null || u.isEmpty()) u = Prefs.server(this) + "/";
+            web.loadUrl(u);
+        } else {
+            web.reload();
+        }
+    }
+
+    private void setBars(String color, boolean lightIcons) {
+        try {
+            int c = Color.parseColor(color);
+            getWindow().setStatusBarColor(c);
+            getWindow().setNavigationBarColor(c);
+            root.setBackgroundColor(c);
+            if (Build.VERSION.SDK_INT >= 23) {
+                int f = getWindow().getDecorView().getSystemUiVisibility();
+                if (lightIcons) f &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                else f |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+                if (Build.VERSION.SDK_INT >= 26) {
+                    if (lightIcons) f &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                    else f |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                }
+                getWindow().getDecorView().setSystemUiVisibility(f);
+            }
+        } catch (Exception ignored) {
+            // رنگ نامعتبر
+        }
     }
 
     // ------------------------------------------------------------------ کمک‌ها
@@ -667,9 +858,7 @@ public class MainActivity extends Activity {
             ui.post(new Runnable() {
                 @Override
                 public void run() {
-                    String u = failedUrl;
-                    if (u == null || u.isEmpty()) u = Prefs.server(MainActivity.this) + "/";
-                    web.loadUrl(u);
+                    retryNow();
                 }
             });
         }
@@ -704,6 +893,43 @@ public class MainActivity extends Activity {
                 @Override
                 public void run() {
                     MainActivity.this.openExternal(Uri.parse(url));
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public boolean lockEnabled() {
+            return Prefs.lock(MainActivity.this);
+        }
+
+        @JavascriptInterface
+        public boolean setLock(final boolean on) {
+            if (on && !deviceSecure()) {
+                ui.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        toast("اول در تنظیمات گوشی یک قفل صفحه (الگو، پین یا اثرانگشت) فعال کنید.");
+                    }
+                });
+                return false;
+            }
+            Prefs.setLock(MainActivity.this, on);
+            ui.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (on) getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+                    else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                }
+            });
+            return true;
+        }
+
+        @JavascriptInterface
+        public void setBars(final String color, final boolean lightIcons) {
+            ui.post(new Runnable() {
+                @Override
+                public void run() {
+                    MainActivity.this.setBars(color, lightIcons);
                 }
             });
         }

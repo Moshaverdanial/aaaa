@@ -20,6 +20,22 @@ TOKEN=$(cat "$RUNNER_TEMP/token")
 adb shell "am start -n ir.dal.app/.MainActivity --es link '#/install'"; sleep 8; shot 3-install
 adb shell "am start -n ir.dal.app/.MainActivity --es link '#/search'"; sleep 8; shot 4-search
 
+# ---- پل جاوااسکریپت از داخل WebView (ابزار توسعه‌دهنده‌ی کروم)
+export NODE_PATH="$RUNNER_TEMP/cdp/node_modules"
+PID=$(adb shell pidof ir.dal.app | tr -d '\r'); adb forward tcp:9222 localabstract:webview_devtools_remote_$PID
+CDP="node $D/cdp.js"
+{
+  echo "== بررسی پل"; $CDP "JSON.stringify([Dal.isApp, DalAndroid.version(), location.href])"
+  echo "== ورود از داخل اپ (باید setToken را صدا بزند)"; $CDP "(async()=>{const r=await Dal.api('/auth/login',{method:'POST',body:{phone:'09120000001',password:'Admin12345'}}); Dal.setSession(r.token,r.user); return 'login ok: '+r.user.name+' token_in_app='+(DalAndroid.server()?'server_set':'no')})()"
+  echo "== ذخیره‌ی فایل (متن و blob)"; $CDP "(async()=>{await Dal.download('cdp-test.txt','سلام دال','text/plain'); await Dal.download('cdp-test.csv', new Blob(['a,b\n1,2'],{type:'text/csv'})); return 'saved'})()"
+  sleep 4; adb shell ls -la /sdcard/Download/Dal/; adb shell cat /sdcard/Download/Dal/cdp-test.txt
+  echo; echo "== قفل (شبیه‌ساز قفل صفحه ندارد؛ باید false بدهد)"; $CDP "JSON.stringify([DalAndroid.setLock(true), DalAndroid.lockEnabled()])"
+  echo "== نوار وضعیت"; $CDP "DalAndroid.setBars('#f6f1e6', false); 'ok'"
+  echo "== کشیدن برای بازخوانی"; T0=$($CDP "String(performance.timeOrigin)"); adb shell input swipe 540 300 540 1000 400; sleep 6; T1=$($CDP "String(performance.timeOrigin)"); echo "before=$T0 after=$T1"
+  echo "== صفحه‌ی /api/app"; $CDP "fetch('/api/app').then(r=>r.text())"
+} > $OUT/7-cdp.txt 2>&1
+$CDP "location.hash='#/my-card'; 'ok'" > /dev/null; sleep 4; shot 7-mycard
+
 # اعلان‌ها: ورود با توکن مدیر، نقطه‌ی شروع، ساخت رویداد در سرور، اجرای دوباره‌ی کار
 adb shell am start -n ir.dal.app/.MainActivity --es dbg_token "$TOKEN"; sleep 4
 adb shell cmd jobscheduler run -f ir.dal.app 4201; sleep 6
@@ -33,6 +49,11 @@ adb shell cmd jobscheduler get-job-state ir.dal.app 4201 >> $OUT/5-notifications
 kill "$(cat "$RUNNER_TEMP/server.pid")" || true
 adb shell am force-stop ir.dal.app; sleep 2
 adb shell am start -n ir.dal.app/.MainActivity; sleep 12; shot 6-offline
+# سرور دوباره روشن می‌شود؛ دکمه‌ی «تلاش دوباره» باید سایت را برگرداند
+(PORT=3000 DAL_DATA_DIR="$RUNNER_TEMP/dal" nohup node server/index.js > "$RUNNER_TEMP/server2.log" 2>&1 &)
+sleep 5
+adb shell input tap 540 1489
+sleep 12; shot 8-recovered
 
 adb logcat -d | grep -E "AndroidRuntime|FATAL|ir.dal.app" | tail -60 > $OUT/logcat.txt || true
 exit 0
