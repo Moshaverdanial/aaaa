@@ -1,60 +1,60 @@
-10-05 03:53:04.326   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{b389889 com.android.phone.auto_generated_rro_product__/10061} BLOCKED
-10-05 03:53:04.326   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{888e08e android.auto_generated_rro_product__/10069} BLOCKED
-10-05 03:53:04.326   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{28710af com.android.internal.systemui.navbar.gestural_narrow_back/10052} BLOCKED
-10-05 03:53:04.326   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{f19cbc com.google.android.inputmethod.latin/10140} BLOCKED
-10-05 03:53:04.326   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{a093445 android.auto_generated_rro_vendor__/10075} BLOCKED
-10-05 03:53:04.327   522  1891 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{636779a com.google.android.apps.restore/10120} BLOCKED
-10-05 03:53:04.362  5603  5603 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->isTagEnabled(J)Z (unsupported, reflection, allowed)
-10-05 03:53:04.362  5603  5603 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->traceBegin(JLjava/lang/String;)V (unsupported, reflection, allowed)
-10-05 03:53:04.362  5603  5603 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->traceEnd(J)V (unsupported, reflection, allowed)
-10-05 03:53:04.362  5603  5603 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V (unsupported, reflection, allowed)
-10-05 03:53:04.362  5603  5603 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->asyncTraceEnd(JLjava/lang/String;I)V (unsupported, reflection, allowed)
-10-05 03:53:04.405  5603  5629 I cr_VariationsUtils: Failed reading seed file "/data/user/0/ir.dal.app/app_webview/variations_seed_new"
-10-05 03:53:04.406  5603  5629 I cr_VariationsUtils: Failed reading seed file "/data/user/0/ir.dal.app/app_webview/variations_seed"
-10-05 03:53:04.448   522   553 I ActivityManager: Start proc 5633:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i1 for  {ir.dal.app/org.chromium.content.app.SandboxedProcessService0:0}
-10-05 03:53:04.521  5603  5638 E chromium: [ERROR:simple_file_enumerator.cc(21)] opendir /data/user/0/ir.dal.app/cache/WebView/Default/HTTP Cache/Code Cache/js: No such file or directory (2)
-10-05 03:53:04.521  5603  5640 E chromium: [ERROR:simple_file_enumerator.cc(21)] opendir /data/user/0/ir.dal.app/cache/WebView/Default/HTTP Cache/Code Cache/wasm: No such file or directory (2)
-10-05 03:53:04.558   522  1891 D ConnectivityService: requestNetwork for uid/pid:10192/5603 activeRequest: null callbackRequest: 147 [NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
-10-05 03:53:04.559   522   764 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.560   522   764 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.560   522   764 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.560   522   764 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.593   522   829 D ConnectivityService: requestNetwork for uid/pid:10192/5603 activeRequest: null callbackRequest: 150 [NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
-10-05 03:53:04.594   522   764 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.596   522   764 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.596   522   764 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.596   522   764 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
-10-05 03:53:04.715   522   829 D CoreBackPreview: Window{53a1127 u0 ir.dal.app/ir.dal.app.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@8a6696, mPriority=0, mIsAnimationCallback=false}
-10-05 03:53:05.139   522   540 W ziparchive: Unable to open '/data/app/~~DwuV4Lrg_L55RgL2uxPy6w==/ir.dal.app-nMwgp6OpK_uQqyIvIMZUeA==/base.dm': No such file or directory
-10-05 03:53:05.144   522   540 I ActivityTaskManager: Displayed ir.dal.app/.MainActivity for user 0: +1s598ms
-10-05 03:53:05.175   522   829 W InputManager-JNI: Input channel object '7805cee Splash Screen ir.dal.app (client)' was disposed without first being removed with the input manager!
-10-05 03:53:05.177   522   606 D CoreBackPreview: Window{7805cee u0 Splash Screen ir.dal.app EXITING}: Setting back callback null
-10-05 03:53:05.256   522  1811 I ImeTracker: ir.dal.app:24b57187: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
-10-05 03:53:05.256   522  1811 I ImeTracker: ir.dal.app:24b57187: onCancelled at PHASE_SERVER_SHOULD_HIDE
-10-05 03:53:05.286  1558  1558 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=ir.dal.app fieldId=0 fieldName=null extras=null}, false)
-10-05 03:53:07.991   522   577 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{f60d82f com.google.android.contacts/10155} BLOCKED
-10-05 03:53:11.128   522   577 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{ebe7bd8 com.google.android.as/10124} BLOCKED
-10-05 03:53:11.996   522  1773 I ActivityManager: Killing 5603:ir.dal.app/u0a192 (adj 0): depends on provider com.google.android.gms/.fonts.provider.FontsProvider in dying proc com.google.android.gms.persistent (adj -10000)
-10-05 03:53:12.047   522  2434 I ImeTracker: ir.dal.app:5ac07d76: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_REMOVE_CLIENT
-10-05 03:53:12.047   522  2434 I ImeTracker: ir.dal.app:5ac07d76: onCancelled at PHASE_SERVER_SHOULD_HIDE
-10-05 03:53:12.047   522  2434 I WindowManager: WIN DEATH: Window{53a1127 u0 ir.dal.app/ir.dal.app.MainActivity}
-10-05 03:53:12.047   522  2434 W InputManager-JNI: Input channel object '53a1127 ir.dal.app/ir.dal.app.MainActivity (client)' was disposed without first being removed with the input manager!
-10-05 03:53:12.048   522   771 D ConnectivityService: releasing NetworkRequest [ REQUEST id=148, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ] (release request)
-10-05 03:53:12.049   522   771 D ConnectivityService: releasing NetworkRequest [ REQUEST id=151, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ] (release request)
-10-05 03:53:12.057   522  2388 W ActivityManager: Scheduling restart of crashed service ir.dal.app/org.chromium.content.app.SandboxedProcessService0:0 in 230951ms for connection
-10-05 03:53:12.061   522  2403 W ActivityTaskManager: Force removing ActivityRecord{5ae546d u0 ir.dal.app/.MainActivity t9}: app died, no saved state
-10-05 03:53:12.063   842   876 V WindowManagerShell: Transition requested: android.os.BinderProxy@18c2120 TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=9 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=ir.dal.app/.MainActivity } baseActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} topActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} origActivity=null realActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} numActivities=1 lastActiveTime=189241 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{android.window.IWindowContainerToken$Stub$Proxy@9820ad9} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 128 - 0, 0) topActivityInfo=ActivityInfo{882ec9e ir.dal.app.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
-10-05 03:53:12.189   522   540 V WindowManager: Sent Transition #15 createdAt=10-05 03:53:12.061 via request=TransitionRequestInfo { type = CLOSE, triggerTask = TaskInfo{userId=0 taskId=9 displayId=0 isRunning=true baseIntent=Intent { flg=0x10000000 cmp=ir.dal.app/.MainActivity } baseActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} topActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} origActivity=null realActivity=ComponentInfo{ir.dal.app/ir.dal.app.MainActivity} numActivities=1 lastActiveTime=189241 supportsMultiWindow=true resizeMode=1 isResizeable=true minWidth=-1 minHeight=-1 defaultMinSize=220 token=WCT{RemoteToken{2b396b4 Task{24158a2 #9 type=standard A=10192:ir.dal.app}}} topActivityType=1 pictureInPictureParams=null shouldDockBigOverlays=false launchIntoPipHostTaskId=-1 lastParentTaskIdBeforePip=-1 displayCutoutSafeInsets=Rect(0, 128 - 0, 0) topActivityInfo=ActivityInfo{19a32dd ir.dal.app.MainActivity} launchCookies=[] positionInParent=Point(0, 0) parentTaskId=-1 isFocused=true isVisible=true isVisibleRequested=true isSleeping=false topActivityInSizeCompat=false topActivityEligibleForLetterboxEducation= false topActivityLetterboxed= false isFromDoubleTap= false topActivityLetterboxVerticalPosition= -1 topActivityLetterboxHorizontalPosition= -1 topActivityLetterboxWidth=-1 topActivityLetterboxHeight=-1 locusId=null displayAreaFeatureId=1 cameraCompatControlState=hidden}, remoteTransition = null, displayChange = null }
-10-05 03:53:16.813  6118  6118 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-10-05 03:53:16.819  6118  6118 I AndroidRuntime: Using default boot image
-10-05 03:53:16.820  6118  6118 I AndroidRuntime: Leaving lock profiling enabled
-10-05 03:53:16.981  6118  6118 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
-10-05 03:53:18.097  6118  6118 D AndroidRuntime: Shutting down VM
-10-05 03:53:18.767   522   577 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{c896dd9 com.google.android.contacts/10155} BLOCKED
-10-05 03:53:24.612   522   577 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{58f6a1b com.google.android.contacts/10155} BLOCKED
-10-05 03:53:34.635   522   577 I AppsFilter: interaction: PackageSetting{cc414e4 ir.dal.app/10192} -> PackageSetting{925b8ae com.google.android.contacts/10155} BLOCKED
-10-05 03:53:37.052  6312  6312 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
-10-05 03:53:37.057  6312  6312 I AndroidRuntime: Using default boot image
-10-05 03:53:37.057  6312  6312 I AndroidRuntime: Leaving lock profiling enabled
-10-05 03:53:37.163  6312  6312 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
-10-05 03:53:38.210  6312  6312 D AndroidRuntime: Shutting down VM
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{f69a927 com.android.systemui.emulation.pixel_7a/10017} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{5262eb6 com.google.android.settings.intelligence/10118} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{3e8dcdd com.google.android.projection.gearhead/10123} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{ea1ed7d com.google.android.uwb.resources/10188} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{75265e3 com.android.cts.ctsshim/10176} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{cfc6472 com.google.android.wifi.resources/10184} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{3db0c3 com.google.android.wifi.dialog/10185} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{ff1dd40 com.google.android.apps.wallpaper/10161} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{ae4e479 com.google.android.odad/10122} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{fa855be com.android.settings.auto_generated_rro_product__/10028} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{3c0961f com.android.internal.systemui.navbar.gestural/10051} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{a97868f com.google.android.apps.youtube.music/10156} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{5c64f35 com.android.bluetoothmidiservice/10108} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{9900fca com.android.storagemanager.auto_generated_rro_product__/10026} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{762753b com.google.android.cellbroadcastreceiver/10189} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{b461458 com.android.phone.auto_generated_rro_product__/10061} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{b19a9b1 android.auto_generated_rro_product__/10069} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{b875e96 com.android.internal.systemui.navbar.gestural_narrow_back/10052} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{5792a17 com.google.android.inputmethod.latin/10142} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{4341e04 android.auto_generated_rro_vendor__/10075} BLOCKED
+10-05 04:02:36.478   520  2247 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{66e2fed com.google.android.apps.restore/10119} BLOCKED
+10-05 04:02:36.519  6233  6233 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->isTagEnabled(J)Z (unsupported, reflection, allowed)
+10-05 04:02:36.519  6233  6233 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->traceBegin(JLjava/lang/String;)V (unsupported, reflection, allowed)
+10-05 04:02:36.519  6233  6233 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->traceEnd(J)V (unsupported, reflection, allowed)
+10-05 04:02:36.519  6233  6233 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->asyncTraceBegin(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+10-05 04:02:36.519  6233  6233 W ir.dal.app: Accessing hidden method Landroid/os/Trace;->asyncTraceEnd(JLjava/lang/String;I)V (unsupported, reflection, allowed)
+10-05 04:02:36.582  6233  6264 I cr_VariationsUtils: Failed reading seed file "/data/user/0/ir.dal.app/app_webview/variations_seed_new"
+10-05 04:02:36.582  6233  6264 I cr_VariationsUtils: Failed reading seed file "/data/user/0/ir.dal.app/app_webview/variations_seed"
+10-05 04:02:36.715   520   550 I ActivityManager: Start proc 6273:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i1 for  {ir.dal.app/org.chromium.content.app.SandboxedProcessService0:0}
+10-05 04:02:36.826   520  1413 D ConnectivityService: requestNetwork for uid/pid:10192/6233 activeRequest: null callbackRequest: 154 [NetworkRequest [ REQUEST id=155, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+10-05 04:02:36.835   520   756 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=155, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.835   520   756 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=155, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.836   520   756 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=155, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.836   520   756 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=155, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.866   520   924 D ConnectivityService: requestNetwork for uid/pid:10192/6233 activeRequest: null callbackRequest: 157 [NetworkRequest [ REQUEST id=158, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]] callback flags: 0 order: 2147483647
+10-05 04:02:36.869   520   756 D WifiNetworkFactory: got request NetworkRequest [ REQUEST id=158, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.869   520   756 D UntrustedWifiNetworkFactory: got request NetworkRequest [ REQUEST id=158, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.869   520   756 D OemPaidWifiNetworkFactory: got request NetworkRequest [ REQUEST id=158, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:36.870   520   756 D MultiInternetWifiNetworkFactory: got request NetworkRequest [ REQUEST id=158, [ Capabilities: INTERNET&NOT_RESTRICTED&TRUSTED&NOT_VCN_MANAGED Uid: 10192 RequestorUid: 10192 RequestorPkg: ir.dal.app UnderlyingNetworks: Null] ]
+10-05 04:02:37.043   520   596 D CoreBackPreview: Window{934f5d9 u0 ir.dal.app/ir.dal.app.MainActivity}: Setting back callback OnBackInvokedCallbackInfo{mCallback=android.window.IOnBackInvokedCallback$Stub$Proxy@cb31703, mPriority=0, mIsAnimationCallback=false}
+10-05 04:02:37.367   520   539 W ziparchive: Unable to open '/data/app/~~rz_-xW5V7QoZ_XnY-ThGgA==/ir.dal.app-C5zdhH3b6ApOu1NG-9dqPw==/base.dm': No such file or directory
+10-05 04:02:37.373   520   539 I ActivityTaskManager: Displayed ir.dal.app/.MainActivity for user 0: +1s952ms
+10-05 04:02:37.408   520  2019 D CoreBackPreview: Window{c4d50d9 u0 Splash Screen ir.dal.app EXITING}: Setting back callback null
+10-05 04:02:37.408   520  2258 W InputManager-JNI: Input channel object 'c4d50d9 Splash Screen ir.dal.app (client)' was disposed without first being removed with the input manager!
+10-05 04:02:37.488   520  2019 I ImeTracker: ir.dal.app:ea636a8e: onRequestHide at ORIGIN_SERVER_HIDE_INPUT reason HIDE_UNSPECIFIED_WINDOW
+10-05 04:02:37.488   520  2019 I ImeTracker: ir.dal.app:ea636a8e: onCancelled at PHASE_SERVER_SHOULD_HIDE
+10-05 04:02:37.538  1547  1547 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x0 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=ir.dal.app fieldId=0 fieldName=null extras=null}, false)
+10-05 04:02:46.469   520   573 I AppsFilter: interaction: PackageSetting{f72d903 ir.dal.app/10192} -> PackageSetting{b4e6121 com.google.android.contacts/10154} BLOCKED
+10-05 04:02:48.351  6428  6428 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-05 04:02:48.365  6428  6428 I AndroidRuntime: Using default boot image
+10-05 04:02:48.365  6428  6428 I AndroidRuntime: Leaving lock profiling enabled
+10-05 04:02:48.584  6428  6428 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-05 04:02:49.634  6428  6428 D AndroidRuntime: Shutting down VM
+10-05 04:03:00.501  6233  6233 W ir.dal.app: Accessing hidden method Landroid/view/MotionEvent;->getEventTimeNano()J (unsupported, reflection, allowed)
+10-05 04:03:00.510  1547  1547 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1877 onStartInput(EditorInfo{inputType=0x0(NULL) imeOptions=0x12000000 privateImeOptions=null actionName=UNSPECIFIED actionLabel=null actionId=0 initialSelStart=-1 initialSelEnd=-1 initialCapsMode=0x0 hintText=null label=null packageName=ir.dal.app fieldId=0 fieldName=null extras=null}, false)
+10-05 04:03:15.017  6480  6480 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 2000 <<<<<<
+10-05 04:03:15.029  6480  6480 I AndroidRuntime: Using default boot image
+10-05 04:03:15.029  6480  6480 I AndroidRuntime: Leaving lock profiling enabled
+10-05 04:03:15.185  6480  6480 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher
+10-05 04:03:59.177  6480  6480 D AndroidRuntime: Shutting down VM

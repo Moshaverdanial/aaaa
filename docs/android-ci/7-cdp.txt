@@ -13,8 +13,8 @@ saved
 + sleep 4
 + adb shell ls -la /sdcard/Download/Dal/
 total 16
--rwxrwx--- 1 u0_a184 media_rw  7 2026-10-05 03:52 cdp-test.csv
--rwxrwx--- 1 u0_a184 media_rw 15 2026-10-05 03:52 cdp-test.txt
+-rwxrwx--- 1 u0_a187 media_rw  7 2026-10-05 04:01 cdp-test.csv
+-rwxrwx--- 1 u0_a187 media_rw 15 2026-10-05 04:01 cdp-test.txt
 + adb shell cat /sdcard/Download/Dal/cdp-test.txt
 سلام دال+ echo
 
@@ -29,13 +29,13 @@ ok
 + echo '== کشیدن برای بازخوانی'
 == کشیدن برای بازخوانی
 ++ node .github/ci/cdp.js 'String(performance.timeOrigin)'
-+ T0=1791172266271.4
++ T0=1791172808245.8
 + adb shell input swipe 540 300 540 1000 400
 + sleep 6
 ++ node .github/ci/cdp.js 'String(performance.timeOrigin)'
-+ T1=1791172345925.2
-+ echo 'before=1791172266271.4 after=1791172345925.2'
-before=1791172266271.4 after=1791172345925.2
++ T1=1791172896403.9
++ echo 'before=1791172808245.8 after=1791172896403.9'
+before=1791172808245.8 after=1791172896403.9
 + echo '== صفحه‌ی /api/app'
 == صفحه‌ی /api/app
 + node .github/ci/cdp.js 'fetch('\''/api/app'\'').then(r=>r.text())'
