@@ -647,3 +647,46 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); box-shado
   .dd-menu, .dd-menu.notif { position: fixed; top: 66px; left: 10px; right: 10px; inset-inline-start: 10px; inset-inline-end: 10px; width: auto; min-width: 0; max-width: none; max-height: 72vh; }
 }
 body { overflow-x: clip; }
+
+/* ================= تایپوگرافی و ریتم فاصله‌ها (v6) ================= */
+/* فونت تیتر: لالزار (مجوز OFL، فایل محلی)؛ متن: وزیرمتن */
+@font-face { font-family: 'Lalezar'; src: url('/fonts/Lalezar.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+:root {
+  --font-display: 'Lalezar', 'Vazirmatn', Tahoma, system-ui, sans-serif;
+  --num: #a8650a; --num-d: #f2cf78; --tel: #0a7c63; --tel-d: #6fe6c4;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 72px;
+}
+[data-theme='dark'] { --num: #f2cf78; --tel: #6fe6c4; }
+body { font-size: 15.5px; line-height: 1.95; font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; letter-spacing: 0; word-spacing: .04em; }
+p { text-wrap: pretty; } h1, h2, h3, h4 { text-wrap: balance; letter-spacing: 0; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.5; font-synthesis: none; }
+h3 { font-size: 19px; font-weight: 800; line-height: 1.6; } h4 { font-size: 16.5px; font-weight: 800; line-height: 1.7; }
+.hero h1, .consult-hero h1 { font-size: clamp(36px, 5.6vw, 66px); font-weight: 400; line-height: 1.4; }
+.sec-head h2 { font-size: clamp(26px, 3.2vw, 38px); letter-spacing: 0; }
+.page-title, .pg-head h1, main h1 { font-size: clamp(30px, 4.4vw, 50px); }
+.logo { font-family: var(--font-display); font-weight: 400; font-size: 29px; letter-spacing: 0; line-height: 1.2; }
+.logo small { font-family: 'Vazirmatn', Tahoma, sans-serif; font-weight: 600; letter-spacing: 0; }
+.logo-mark { font-family: var(--font-display); font-weight: 400; }
+.hero-stats b, b[data-count], .kpi b, .stat b { font-family: var(--font-display); font-weight: 400; font-size: 40px; line-height: 1.2; background: linear-gradient(180deg, #fff1bf, #e2b44f); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.lcard-price, .price, .big-price { font-weight: 900; color: var(--num); letter-spacing: 0; } .lcard-price small, .price small { color: var(--muted); }
+.lead, p.lead { line-height: 2.05; }
+/* عددها و شماره‌ها با رنگ جدا (با JS و ::highlight؛ بدون دست‌زدن به محتوا) */
+::highlight(dal-num) { color: var(--num); } ::highlight(dal-num-d) { color: var(--num-d); }
+::highlight(dal-tel) { color: var(--tel); } ::highlight(dal-tel-d) { color: var(--tel-d); }
+a[href^="tel:"] { font-weight: 800; direction: ltr; unicode-bidi: plaintext; }
+/* ریتم فاصله‌ها: همه‌ی بخش‌ها و کارت‌ها یک مقیاس دارند */
+.section { padding: var(--sp-8) 0; } .section.tight { padding: var(--sp-6) 0; }
+.sec-head { margin-bottom: var(--sp-6); gap: var(--sp-4); } .sec-head p { margin-top: var(--sp-1); font-size: 14.5px; }
+.grid { gap: var(--sp-5); } .cat-grid, .city-grid { gap: var(--sp-4); }
+h1 + p, h2 + p, h3 + p, h4 + p { margin-top: var(--sp-2); }
+.card, .pad { padding: var(--sp-5); } .step { padding: var(--sp-6) var(--sp-5); }
+.fld { gap: var(--sp-2); } .form-grid { gap: var(--sp-4) var(--sp-5); }
+.lcard-body { padding: var(--sp-4) var(--sp-4) var(--sp-3); gap: var(--sp-1); }
+@media (max-width: 760px) {
+  body { font-size: 15px; }
+  .section { padding: 44px 0; } .section.tight { padding: var(--sp-5) 0; }
+  .sec-head { margin-bottom: var(--sp-5); } .grid { gap: var(--sp-4); }
+  .hero h1 { font-size: clamp(34px, 9.4vw, 46px); }
+  .hero-stats b, b[data-count] { font-size: 34px; }
+}
+@media (max-width: 1000px) { .footer { padding-bottom: 96px; } }

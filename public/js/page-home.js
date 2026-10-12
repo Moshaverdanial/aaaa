@@ -80,7 +80,7 @@
           </div>
           <div class="examples"><span>${icon('zap', 14)} امتحان کنید:</span>${Dal.EXAMPLES.slice(0, 4).map((x) => html`<button type="button" data-ex="${x}">${x}</button>`)}</div>
         </div>
-        <div class="hero-stats">${[[stats.listings, 'آگهی فعال'], [stats.agents, 'مشاور'], [stats.closed, 'معامله‌ی ثبت‌شده'], [stats.districts, 'محله‌ی تحت پوشش']].filter(([n]) => n > 0).map(([n, t]) => html`<div><b data-count="${n}">۰</b><span>${t}</span></div>`)}</div>
+        <div class="hero-stats">${[[stats.listings, 'آگهی فعال'], [stats.agents, 'مشاور'], [stats.closed, 'معامله‌ی ثبت‌شده']].filter(([n]) => n > 0).map(([n, t]) => html`<div><b data-count="${n}">۰</b><span>${t}</span></div>`)}</div>
       </div></section>
 
     <section class="section tight"><div class="container"><div class="focus-band">
