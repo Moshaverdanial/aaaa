@@ -59,4 +59,29 @@ async function prune() {
 }
 function startPrune() { setInterval(() => prune().catch(() => {}), 3600e3).unref(); }
 
-module.exports = { getTile, upstreamUrl, stats, prune, startPrune };
+
+// ---- پیش‌بارگذاری کاشی‌های هسته‌ی کنگان (یک بار؛ بعدش نقشه‌ی کنگان بدون اینترنت هم کار می‌کند)
+// کم و آرام: فقط هسته‌ی شهر، زوم ۱۰ تا ۱۵، حدود ۲ کاشی در ثانیه؛ مطابق سیاست استفاده‌ی OpenStreetMap
+const CORE = { s: 27.77, n: 27.91, w: 51.99, e: 52.14 };
+const tx = (lon, z) => Math.floor(((lon + 180) / 360) * 2 ** z);
+const ty = (lat, z) => { const r = (lat * Math.PI) / 180; return Math.floor(((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * 2 ** z); };
+function coreTiles(zmin = 10, zmax = 15) {
+  const out = [];
+  for (let z = zmin; z <= zmax; z++) for (let x = tx(CORE.w, z); x <= tx(CORE.e, z); x++) for (let y = ty(CORE.n, z); y <= ty(CORE.s, z); y++) out.push([z, x, y]);
+  return out;
+}
+async function warm(styles = ['light', 'dark'], { zmin = 10, zmax = 15, delayMs = 450, onProgress = () => {} } = {}) {
+  const list = coreTiles(zmin, zmax); const total = list.length * styles.length; let done = 0, fetched = 0, failed = 0;
+  for (const style of styles) for (const [z, x, y] of list) {
+    const file = path.join(DIR, style, String(z), String(x), `${y}.png`);
+    let cached = false; try { cached = Date.now() - fs.statSync(file).mtimeMs < FRESH_MS; } catch { /* miss */ }
+    if (!cached) {
+      try { await fetchTile(style, z, x, y, file); fetched++; } catch { failed++; }
+      await new Promise((r) => setTimeout(r, delayMs));
+    }
+    done++; onProgress({ done, total, fetched, failed });
+  }
+  return { total, fetched, failed };
+}
+
+module.exports = { getTile, upstreamUrl, stats, prune, startPrune, warm, coreTiles };

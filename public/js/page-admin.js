@@ -158,6 +158,7 @@
           const mb = (b) => Dal.fa((b / 1048576).toFixed(1));
           mount(out, html`<div class="table-wrap"><table><thead><tr><th>سرویس</th><th>وضعیت</th><th>زمان پاسخ</th><th>توضیح</th></tr></thead><tbody>
             ${d.checks.map((c) => html`<tr><td>${NAMES[c.name]}</td><td><span class="pill ${c.ok ? 'ok' : 'bad'}">${c.ok ? 'در دسترس' : 'در دسترس نیست'}</span></td><td>${c.ms ? Dal.fa(c.ms) + ' ms' : '—'}</td><td class="muted" style="font-size:13px">${c.ok ? '' : (c.error ? c.error + ' — ' : '') + HINT[c.name]}</td></tr>`)}</tbody></table></div>
+          <p class="muted mt" style="font-size:13.5px">ربات گفتگو: ${d.bot && d.bot.length ? d.bot.map((b) => `${b.label}: ${b.running ? 'روشن (@' + b.username + ')' : 'خاموش — ' + (b.error || 'در حال اتصال')}`).join(' | ') : 'توکن ربات هنوز تنظیم نشده است.'}</p>
             <p class="muted mt" style="font-size:13px">Node ${d.node} · پایگاه‌داده ${mb(d.dbBytes)} مگابایت · کش نقشه ${Dal.fa(d.tiles.count)} کاشی (${mb(d.tiles.bytes)} مگابایت) · پشتیبان‌های محلی: ${d.backups.length ? d.backups.join('، ') : 'هنوز نیست'} · ${d.trustProxy ? 'پشت پروکسی' : 'بدون پروکسی'}</p>`);
         };
       },

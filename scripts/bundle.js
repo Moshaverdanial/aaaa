@@ -56,7 +56,7 @@ if (!fs.existsSync(stamp) || fs.readFileSync(stamp, 'utf8') !== VERSION) {
   }
   fs.writeFileSync(stamp, VERSION);
 }
-const cli = ['admin', 'reset-password', 'backup', 'stats'].includes(process.argv[2]);
+const cli = ['admin', 'reset-password', 'backup', 'stats', 'warm-tiles'].includes(process.argv[2]);
 const args = cli ? ['--no-warnings', path.join(APP, 'server', 'cli.js'), ...process.argv.slice(2)] : ['--no-warnings', path.join(APP, 'server', 'index.js')];
 const child = spawn(process.execPath, args, { stdio: 'inherit', env: { ...process.env, DAL_DATA_DIR: process.env.DAL_DATA_DIR || path.join(HOME, 'data') } });
 for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => child.kill(s));

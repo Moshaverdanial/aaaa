@@ -149,7 +149,8 @@ async function diagnostics() {
     probe('tiles', upstream, { okIf: (s) => s === 200 }),
     probe('geocoder', 'https://nominatim.openstreetmap.org/status', { okIf: (s) => s === 200 }),
   ]);
-  return { checks: [a, b, c, d], configured: { telegram: !!tg, bale: !!bale } };
+  let bot = []; try { bot = require('./bot').status(); } catch { /* ignore */ }
+  return { checks: [a, b, c, d], configured: { telegram: !!tg, bale: !!bale }, bot };
 }
 
 // ---------------------------------------------------------------- نشانی‌یابی (Nominatim)

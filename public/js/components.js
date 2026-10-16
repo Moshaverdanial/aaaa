@@ -146,13 +146,17 @@
       const s = document.createElement('script'); s.src = '/vendor/leaflet/leaflet.js'; s.onload = () => { window.L.Icon.Default.imagePath = '/vendor/leaflet/images/'; cssReady.then(() => res(window.L)); }; s.onerror = rej; document.head.appendChild(s);
     }));
   })();
-  Dal.makeMap = async (el, { center, zoom = 12, scroll = false } = {}) => {
+  // ناحیه‌ی تمرکز کنگان: نقشه فقط همین محدوده را می‌گیرد؛ کاشی‌ی کمتر یعنی سبک‌تر و سریع‌تر (به‌خصوص با اینترنت ضعیف)
+  Dal.KANGAN = { center: [27.8376, 52.0643], bounds: [[27.60, 51.90], [28.05, 52.45]] };
+  const inKangan = (c) => !!c && c[0] > 27.60 && c[0] < 28.05 && c[1] > 51.90 && c[1] < 52.45;
+  Dal.makeMap = async (el, { center, zoom = 12, scroll = false, focus } = {}) => {
     const L = await Dal.loadLeaflet();
-    const map = L.map(el, { center, zoom, scrollWheelZoom: scroll, zoomControl: true, attributionControl: false });
+    const kg = focus === 'kangan' || (focus !== false && inKangan(center));
+    const map = L.map(el, { center, zoom, scrollWheelZoom: scroll, zoomControl: true, attributionControl: false, ...(kg ? { minZoom: 10, maxZoom: 17, maxBounds: Dal.KANGAN.bounds, maxBoundsViscosity: 0.9 } : {}) });
     L.control.attribution({ prefix: false }).addTo(map);
     const dark = document.documentElement.dataset.theme === 'dark';
     // کاشی‌ها از خود سرور دال می‌آیند (کش دیسکی)؛ مرورگر به سرور نقشه‌ی خارجی وصل نمی‌شود
-    const layer = L.tileLayer(`/tiles/${dark ? 'dark' : 'light'}/{z}/{x}/{y}.png`, { maxZoom: 18, attribution: '© OpenStreetMap', crossOrigin: false }).addTo(map);
+    const layer = L.tileLayer(`/tiles/${dark ? 'dark' : 'light'}/{z}/{x}/{y}.png`, { maxZoom: kg ? 17 : 18, attribution: '© OpenStreetMap', crossOrigin: false, keepBuffer: 1, updateWhenIdle: true, ...(kg ? { minZoom: 10, bounds: Dal.KANGAN.bounds } : {}) }).addTo(map);
     let ok = 0, bad = 0, notified = false;
     layer.on('tileload', () => { ok++; });
     layer.on('tileerror', () => {

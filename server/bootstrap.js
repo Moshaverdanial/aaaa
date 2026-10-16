@@ -78,6 +78,7 @@ function start() {
   expireJob(); setInterval(expireJob, 6 * 3600e3).unref();
   try { require('./team').start(); } catch (e) { console.error('team:', e.message); }
   require('./tiles').startPrune();
+  try { require('./bot').start(); } catch (e) { console.error('bot:', e.message); }
   const X = require('./extern'); setTimeout(() => X.dailyBackup(), 30e3).unref(); setInterval(() => X.dailyBackup(), 6 * 3600e3).unref();
 }
 

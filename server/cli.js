@@ -46,7 +46,14 @@ const die = (m) => { console.error('❌ ' + m); process.exit(1); };
     const n = (s) => q.get(s).n;
     { const o = { users: n('SELECT COUNT(*) n FROM users'), agents: n(`SELECT COUNT(*) n FROM users WHERE role='agent'`), active_listings: n(`SELECT COUNT(*) n FROM listings WHERE status='active'`), pending_listings: n(`SELECT COUNT(*) n FROM listings WHERE status='pending'`) };
       console.log(say.en ? o : { کاربران: o.users, مشاوران: o.agents, آگهی_فعال: o.active_listings, در_انتظار: o.pending_listings }); }
+  } else if (cmd === 'warm-tiles') {
+    const T = require('./tiles'); const which = a[0] === 'light' || a[0] === 'dark' ? [a[0]] : ['light', 'dark'];
+    const n = T.coreTiles().length * which.length;
+    console.log(say(`پیش‌بارگذاری نقشه‌ی هسته‌ی کنگان: حدود ${n} کاشی (چند مگابایت). کمی صبر کنید…`, `Downloading the Kangan core map: about ${n} tiles (a few MB). Please wait...`));
+    let last = 0;
+    const r = await T.warm(which, { onProgress: (p) => { if (p.done - last >= 50 || p.done === p.total) { last = p.done; console.log(`${p.done}/${p.total}`); } } });
+    console.log(say(`✅ تمام شد: ${r.fetched} کاشی گرفته شد، ${r.failed} ناموفق. ${r.failed ? 'اگر سرور نقشه در دسترس نیست با فیلترشکن دوباره اجرا کنید.' : ''}`, `OK: done. ${r.fetched} tiles downloaded, ${r.failed} failed. ${r.failed ? 'If the map server is blocked, run it again with a VPN on.' : ''}`));
   } else {
-    console.log(say('دستورها: admin | reset-password | backup | stats', 'Commands: admin | reset-password | backup | stats')); process.exit(cmd ? 1 : 0);
+    console.log(say('دستورها: admin | reset-password | backup | stats | warm-tiles', 'Commands: admin | reset-password | backup | stats | warm-tiles')); process.exit(cmd ? 1 : 0);
   }
 })();

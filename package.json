@@ -11,7 +11,7 @@
     "stats": "node --no-warnings server/cli.js stats",
     "bundle": "node scripts/bundle.js",
     "seed:demo": "node --no-warnings server/seed.js --force",
-    "test": "node --no-warnings --test server/tests/api.test.js"
+    "test": "node --no-warnings --test server/tests/api.test.js server/tests/bot.test.js"
   },
   "engines": {
     "node": ">=22.13"

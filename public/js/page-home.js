@@ -90,6 +90,11 @@
         <div class="row gap wrap"><a class="btn" href="#/city/${c.slug}">${n ? num(n) + ' آگهی' : 'صفحه‌ی ' + c.name}</a><a class="btn ghost" href="#/sell?city=${c.slug}">${icon('home', 16)} می‌سپارم</a><button class="btn ghost" data-consult="${c.slug}">${icon('phone', 16)} مشاوره</button><a class="btn ghost" href="#/market?city=${c.slug}">${icon('chart', 16)} بازار</a></div></div>`; })}
     </div></div></section>
 
+    <section class="section tight" id="kmap-sec"><div class="container">
+      ${Dal.sectionHead('نقشه‌ی بندر کنگان', 'فقط ناحیه‌ی کنگان؛ سبک و سریع', ['#/search?city=kangan&view=map', 'جستجو روی نقشه'])}
+      <div class="kmap-wrap"><div id="kmap" class="kmap" role="img" aria-label="نقشه‌ی بندر کنگان"></div><div class="kmap-note" id="kmap-note" hidden></div></div>
+    </div></section>
+
     ${recent.length ? html`<section class="section tight"><div class="container">${Dal.sectionHead('اخیراً دیده‌اید', 'ادامه‌ی جستجو از همان‌جایی که مانده بودید')}<div class="recent-strip">${recent.map((r) => html`<a class="recent" href="#/listing/${r.id}"><img src="${r.img}" alt="" loading="lazy"><div><b>${r.price.main} ${r.price.unit}</b>${r.title}</div></a>`)}</div></div></section>` : ''}
 
     <section class="section"><div class="container">
@@ -147,6 +152,24 @@
 
     <section class="section tight"><div class="container"><div class="cta"><div><h2 style="font-size:30px">ملک دارید؟ رایگان آگهی کنید</h2><p style="opacity:.85;margin-top:6px">در کمتر از ۳ دقیقه آگهی بسازید و به خریداران و مستأجران برسید.</p></div><a class="btn accent lg" href="#/new">${icon('plus', 20)} ثبت آگهی رایگان</a></div></div></section>`);
 
+    // نقشه‌ی کنگان: فقط وقتی به آن برسید بارگذاری می‌شود (کتابخانه‌ی نقشه و کاشی‌ها دیرتر می‌آیند)
+    (() => {
+      const box = $('#kmap', app); if (!box) return; let started = false;
+      const go = async () => {
+        if (started) return; started = true;
+        try {
+          const L = await Dal.loadLeaflet(); if (!alive()) return;
+          const map = await Dal.makeMap(box, { center: Dal.KANGAN.center, zoom: 13, scroll: false, focus: 'kangan' });
+          const pins = await Dal.api('/listings/map', { query: { city: 'kangan' } }).catch(() => ({ items: [] }));
+          if (!alive()) return;
+          const pts = pins.items.filter((p) => p.lat && p.lng);
+          pts.forEach((p) => L.marker([p.lat, p.lng], { icon: Dal.pricePin(L, Dal.priceShort(p.deal === 'rent' ? (p.rent || p.price) : p.price), p.deal) }).addTo(map).bindPopup(Dal.mapPopup(p)));
+          if (pts.length) map.fitBounds(L.latLngBounds(pts.map((p) => [p.lat, p.lng])).pad(0.25), { maxZoom: 15 });
+          else { const n = $('#kmap-note', app); if (n) { n.hidden = false; n.textContent = 'هنوز آگهی‌ای با موقعیت روی نقشه ثبت نشده است. اولین آگهی کنگان را شما ثبت کنید.'; } }
+        } catch { box.textContent = 'نقشه در دسترس نیست؛ اینترنت را بررسی کنید.'; }
+      };
+      if ('IntersectionObserver' in window) { const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); go(); } }, { rootMargin: '200px' }); io.observe(box); } else go();
+    })();
     $$('[data-count]', app).forEach((el) => animateCount(el, +el.dataset.count));
     Dal.bindSmart(app);
     let deal = 'sale';
