@@ -1,0 +1,170 @@
+# ساخت خودکار اپ اندروید دال (APK) روی سرورهای رایگان گیت‌هاب + آزمون روی شبیه‌ساز.
+# اجرای دستی: برگه‌ی Actions ← «Build Android APK» ← Run workflow  (می‌توانید آدرس سرور را هم بدهید)
+# بعد از پایان: Releases ← android-latest ← فایل dal.apk  (نسخه‌ی آماده هم در release/dal.apk داخل مخزن ذخیره می‌شود)
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      server_url:
+        description: 'آدرس سرور دال (اختیاری؛ مثلا https://dal.example.ir). خالی = اپ در اولین اجرا می‌پرسد'
+        required: false
+        default: ''
+  push:
+    paths:
+      - 'android/**'
+      - '.github/workflows/android.yml'
+      - '.github/ci/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Accept Android licenses
+        shell: bash
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+
+      - name: Build release APK
+        shell: bash
+        working-directory: android
+        env:
+          SERVER_URL: ${{ inputs.server_url || vars.DAL_SERVER_URL }}
+        run: |
+          gradle --no-daemon --stacktrace assembleRelease \
+            -PdalVersionCode=${{ github.run_number }} \
+            -PdalVersionName=1.${{ github.run_number }} \
+            -PdalServer="${SERVER_URL}" 2>&1 | tee ../build.log
+
+      - name: Collect and inspect APK
+        shell: bash
+        run: |
+          mkdir -p out release
+          cp android/app/build/outputs/apk/release/app-release.apk out/dal.apk
+          cp out/dal.apk release/dal.apk
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          { ls -la out/dal.apk; "$BT/aapt2" dump badging out/dal.apk | grep -E "^package|application-label:|sdkVersion|uses-permission|launchable" ; "$BT/apksigner" verify --verbose --print-certs out/dal.apk 2>&1 | head -4; "$BT/aapt2" dump xmltree out/dal.apk --file AndroidManifest.xml | grep -E "host|scheme|shortcuts" ; unzip -l out/dal.apk | grep -E "shortcuts|offline"; } | bash .github/ci/notice.sh "APK info"
+
+      - name: Show build errors as annotation
+        if: failure()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          t = open('build.log', errors='replace').read()
+          lines = t.splitlines()
+          keep = []
+          for i, l in enumerate(lines):
+              if re.search(r'error:|FAILURE|What went wrong|Exception|Could not|not found|cannot find', l, re.I):
+                  keep.extend(lines[max(0, i-1):i+4])
+          msg = '\n'.join(dict.fromkeys(keep))[:6000] or t[-3000:]
+          msg = msg.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=Android build failed::' + msg)
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dal-android-apk
+          path: out/dal.apk
+
+      - name: Publish release (android-latest)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --cleanup-tag -y || true
+          gh release create android-latest out/dal.apk \
+            --target "${{ github.sha }}" \
+            --title "Dal Android 1.${{ github.run_number }}" \
+            --notes "APK نصب‌شدنی اپ اندروید دال. نسخه 1.${{ github.run_number }}"
+
+      - name: Save APK into the repository
+        shell: bash
+        run: |
+          bash .github/ci/commit-back.sh "release/dal.apk: اپ اندروید دال نسخه‌ی 1.${{ github.run_number }}" release/dal.apk
+
+  smoke:
+    needs: apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK (server = emulator host)
+        shell: bash
+        working-directory: android
+        run: gradle --no-daemon assembleDebug -PdalVersionCode=1 -PdalVersionName=ci 2>&1 | tail -30
+
+      - name: Start Dal server
+        shell: bash
+        run: |
+          export PORT=3000 DAL_DATA_DIR="$RUNNER_TEMP/dal" DAL_ADMIN_PHONE=09120000001 DAL_ADMIN_PASSWORD=Admin12345
+          nohup node server/index.js > "$RUNNER_TEMP/server.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/server.pid"
+          for i in $(seq 1 30); do curl -sf localhost:3000/api/health && break; sleep 1; done
+          curl -s -XPOST localhost:3000/api/auth/login -H 'content-type: application/json' -d '{"phone":"09120000001","password":"Admin12345"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['token'])" > "$RUNNER_TEMP/token"
+
+      - name: Install CDP client
+        shell: bash
+        run: npm i --prefix "$RUNNER_TEMP/cdp" ws --no-audit --no-fund
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Emulator smoke test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: bash .github/ci/smoke.sh
+
+      - name: Report results
+        if: always()
+        shell: bash
+        run: |
+          { cat docs/android-ci/7-cdp.txt 2>/dev/null; echo ---; cat docs/android-ci/5-notifications.txt 2>/dev/null; echo ---; cat docs/android-ci/logcat.txt 2>/dev/null | tail -25; echo ---; grep -o 'text="[^"]\{2,40\}"' docs/android-ci/3-install.xml 2>/dev/null | head -25 || true; } | bash .github/ci/notice.sh "Emulator results"
+
+      - name: Save screenshots into the repository
+        if: always()
+        shell: bash
+        run: |
+          bash .github/ci/commit-back.sh "docs/android-ci: خروجی آزمون شبیه‌ساز" docs/android-ci
