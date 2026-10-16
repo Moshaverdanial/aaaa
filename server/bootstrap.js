@@ -1,4 +1,5 @@
 'use strict';
+const say = require('./say');
 /* راه‌اندازی اولیه: محتوای مجله، ساخت مدیر، توکن راه‌اندازی و کارهای دوره‌ای */
 const crypto = require('node:crypto');
 const fs = require('node:fs');
@@ -31,11 +32,11 @@ function createUser({ name, phone, password, role = 'user', verified = 0, agency
 function ensureAdminFromEnv() {
   const phone = U.normPhone(process.env.DAL_ADMIN_PHONE || ''), pw = process.env.DAL_ADMIN_PASSWORD || '';
   if (!phone || !pw || hasAdmin()) return null;
-  if (!U.validPhone(phone) || !U.validPassword(pw)) { console.warn('⚠️  DAL_ADMIN_PHONE / DAL_ADMIN_PASSWORD نامعتبر است (رمز حداقل ۸ نویسه با حرف و عدد).'); return null; }
+  if (!U.validPhone(phone) || !U.validPassword(pw)) { console.warn(say('⚠️  DAL_ADMIN_PHONE / DAL_ADMIN_PASSWORD نامعتبر است (رمز حداقل ۸ نویسه با حرف و عدد).', 'WARNING: DAL_ADMIN_PHONE / DAL_ADMIN_PASSWORD is invalid (password: 8+ characters with letters and digits).')); return null; }
   const existing = q.get('SELECT id FROM users WHERE phone=?', phone);
   if (existing) { q.run(`UPDATE users SET role='admin', verified=1 WHERE id=?`, existing.id); return existing.id; }
   const r = createUser({ name: process.env.DAL_ADMIN_NAME || 'مدیر دال', phone, password: pw, role: 'admin', verified: 1 });
-  console.log(`✅ حساب مدیر ساخته شد. کد بازیابی: ${r.recovery} (آن را در جای امن نگه دارید)`);
+  console.log(say(`✅ حساب مدیر ساخته شد. کد بازیابی: ${r.recovery} (آن را در جای امن نگه دارید)`, `OK: admin account created. Recovery code: ${r.recovery} (keep it somewhere safe)`));
   return r.id;
 }
 
@@ -65,14 +66,14 @@ function expireJob() {
 
 function start() {
   // مقاله‌های آموزشی آماده فقط با DAL_SEED_ARTICLES=1 اضافه می‌شوند؛ پیش‌فرض: مجله خالی است تا خودتان محتوا بنویسید.
-  const n = /^(1|true|yes)$/i.test(process.env.DAL_SEED_ARTICLES || '') ? ensureArticles() : 0; if (n) console.log(`📰 ${n} مقاله‌ی آموزشی مجله افزوده شد.`);
+  const n = /^(1|true|yes)$/i.test(process.env.DAL_SEED_ARTICLES || '') ? ensureArticles() : 0; if (n) console.log(say(`📰 ${n} مقاله‌ی آموزشی مجله افزوده شد.`, `${n} magazine articles added.`));
   ensureAdminFromEnv();
   const t = setupToken();
   if (t) {
     const port = +process.env.PORT || 3000;
-    console.log('\n🔑 هنوز مدیری ساخته نشده است. برای ساخت حساب مدیر یکی از این دو راه را بروید:');
-    console.log(`   ۱) مرورگر:  http://localhost:${port}/#/setup   (کد راه‌اندازی: ${t})`);
-    console.log('   ۲) ترمینال: npm run admin -- 09123456789 "نام مدیر"\n');
+    console.log(say('\n🔑 هنوز مدیری ساخته نشده است. برای ساخت حساب مدیر یکی از این دو راه را بروید:', '\nNo admin account yet. Create one in one of two ways:'));
+    console.log(say(`   ۱) مرورگر:  http://localhost:${port}/#/setup   (کد راه‌اندازی: ${t})`, `   1) Browser:  http://localhost:${port}/#/setup   (setup code: ${t})`));
+    console.log(say('   ۲) ترمینال: npm run admin -- 09123456789 "نام مدیر"\n', '   2) Terminal:  node dal.js admin 09123456789 Admin YourPassword123\n'));
   }
   expireJob(); setInterval(expireJob, 6 * 3600e3).unref();
   try { require('./team').start(); } catch (e) { console.error('team:', e.message); }

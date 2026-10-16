@@ -958,5 +958,5 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-if (require.main === module) server.listen(PORT, '0.0.0.0', () => console.log(`🏡 دال روی پورت ${PORT} در حال اجراست → http://localhost:${PORT}`));
+if (require.main === module) server.listen(PORT, '0.0.0.0', () => console.log(require('./say')(`🏡 دال روی پورت ${PORT} در حال اجراست → http://localhost:${PORT}`, `Dal is running on port ${PORT} -> open http://localhost:${PORT} in your browser. Keep this window open.`)));
 module.exports = { server, routes };

@@ -123,7 +123,7 @@ async function remoteBackup() {
   } catch (e) { return { error: { ok: false, error: e.message } }; } finally { try { fs.unlinkSync(tmp); } catch { /* ignore */ } }
 }
 async function dailyBackup() {
-  try { localBackup(); } catch (e) { console.warn('پشتیبان محلی ناموفق بود:', e.message); }
+  try { localBackup(); } catch (e) { console.warn(require('./say')('پشتیبان محلی ناموفق بود:', 'Local backup failed:'), e.message); }
   if (!channels().length) return;
   const today = new Date().toISOString().slice(0, 10);
   if (getSetting('last_remote_backup') === today) return;
