@@ -690,3 +690,13 @@ h1 + p, h2 + p, h3 + p, h4 + p { margin-top: var(--sp-2); }
   .hero-stats b, b[data-count] { font-size: 34px; }
 }
 @media (max-width: 1000px) { .footer { padding-bottom: 96px; } }
+
+/* ---- قیمت: فونت تیتر و طلایی؛ کارت آگهی فشرده‌تر و خواناتر ---- */
+.lcard-price { line-height: 1.5; display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap; color: var(--num); }
+.lcard-price b, .l-price b { font-family: var(--font-display); font-weight: 400; color: var(--num); letter-spacing: 0; }
+.lcard-price b { font-size: 27px; line-height: 1.4; } .l-price b { font-size: 44px; line-height: 1.3; }
+.lcard-sub { line-height: 1.6; font-size: 12.5px; }
+.lcard-title { line-height: 1.75; font-size: 15.5px; } .lcard-loc { line-height: 1.7; }
+.lcard-body { padding: var(--sp-3) var(--sp-4) var(--sp-4); gap: 2px; }
+.lcard-meta { gap: var(--sp-2) var(--sp-4); padding: var(--sp-3) 0; margin-top: var(--sp-2); line-height: 1.6; }
+.lcard-foot { line-height: 1.6; }

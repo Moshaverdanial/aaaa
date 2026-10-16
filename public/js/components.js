@@ -17,8 +17,8 @@
     const meta = [
       l.area ? html`<span title="متراژ">${icon('ruler', 16)}${num(l.area)} متر</span>` : '',
       l.rooms ? html`<span title="اتاق خواب">${icon('bed', 16)}${num(l.rooms)} خواب</span>` : '',
-      l.baths && l.rooms ? html`<span title="سرویس">${icon('bath', 16)}${num(l.baths)}</span>` : '',
-      l.parking ? html`<span title="پارکینگ">${icon('car', 16)}</span>` : '',
+      l.baths && l.rooms ? html`<span title="سرویس">${icon('bath', 16)}${num(l.baths)} سرویس</span>` : '',
+      l.parking ? html`<span title="پارکینگ">${icon('car', 16)}پارکینگ</span>` : '',
     ];
     return html`<article class="lcard ${layout}" data-id="${l.id}">
       <a class="lcard-img" href="#/listing/${l.id}" aria-label="${l.title}">

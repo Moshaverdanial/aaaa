@@ -27,7 +27,7 @@
   const fa = (s) => String(s ?? '').replace(/\d/g, (d) => FA[d]);
   const en = (s) => String(s ?? '').replace(/[۰-۹]/g, (d) => FA.indexOf(d)).replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٬,،\s]/g, '').replace(/٫/g, '.');
   const num = (n) => (n == null || n === '' || isNaN(n) ? '—' : fa(Math.round(Number(n)).toLocaleString('en-US').replace(/,/g, '٬')));
-  const dec = (n, d = 1) => (n == null || isNaN(n) ? '—' : fa(Number(n).toFixed(d).replace(/\.0+$/, '').replace('.', '٫')));
+  const dec = (n, d = 1) => (n == null || isNaN(n) ? '—' : fa(Number(n).toFixed(d).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '').replace('.', '٫')));
 
   function priceWords(n) {
     n = Math.round(Number(n)); if (!n) return '—';
@@ -48,7 +48,7 @@
     const f = short ? priceShort : (x) => priceWords(x).replace(' تومان', '');
     if (l.deal === 'rent') return { main: l.rent ? `${f(l.rent)} اجاره` : 'رهن کامل', sub: `ودیعه ${f(l.price)}`, unit: 'تومان' };
     if (l.deal === 'swap' && !l.price) return { main: 'توافقی', sub: 'معاوضه / مشارکت', unit: '' };
-    return { main: f(l.price), sub: l.ppm ? `متری ${priceShort(l.ppm)}` : '', unit: 'تومان' };
+    return { main: f(l.price), sub: l.ppm ? `هر متر ${priceShort(l.ppm)}` : '', unit: 'تومان' };
   }
   const parseDate = (s) => { if (!s) return new Date(); return new Date(String(s).includes('T') ? s : String(s).replace(' ', 'T') + (String(s).length > 10 ? 'Z' : 'T12:00:00')); };
   const jf = (opts) => new Intl.DateTimeFormat('fa-IR-u-ca-persian', opts);
