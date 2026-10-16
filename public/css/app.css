@@ -705,5 +705,5 @@ h1 + p, h2 + p, h3 + p, h4 + p { margin-top: var(--sp-2); }
 .kmap-wrap { position: relative; border-radius: 22px; overflow: hidden; border: 1px solid var(--glass-line, var(--line)); box-shadow: var(--shadow); }
 .kmap { height: clamp(300px, 46vh, 460px); background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
 .kmap .leaflet-container { font-family: inherit; }
-.kmap-note { position: absolute; inset-inline: 12px; bottom: 12px; z-index: 500; padding: 10px 14px; border-radius: 14px; font-size: 13.5px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(8px); border: 1px solid var(--line); text-align: center; }
+.kmap-note { position: absolute;  top: 12px; inset-inline: 60px 12px; z-index: 500; padding: 10px 14px; border-radius: 14px; font-size: 13.5px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(8px); border: 1px solid var(--line); text-align: center; }
 .kmap-note[hidden] { display: none; }
