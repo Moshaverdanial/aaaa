@@ -115,7 +115,7 @@
         break;
       } catch (e) { lastErr = e; res = null; if (i < tries - 1) await new Promise((r) => setTimeout(r, 700 * (i + 1))); }
     }
-    if (!res) throw new Error(lastErr?.name === 'TimeoutError' ? 'اتصال کند است و پاسخی نیامد. دوباره تلاش کنید.' : 'ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید.');
+    if (!res) throw new Error(lastErr?.name === 'TimeoutError' ? 'اتصال کند است و پاسخی نیامد. دوباره تلاش کنید.' : (/^(localhost|127\.|\[::1\])/.test(location.hostname) ? 'سرور دال روشن نیست. پنجره‌ی CMD را که در آن «node dal.js» اجرا کرده‌اید باز بگذارید (اگر بسته شده، دوباره اجرایش کنید) و بعد همین صفحه را تازه کنید.' : 'ارتباط با سرور برقرار نشد. اینترنت خود را بررسی کنید.'));
     let data = {}; try { data = await res.json(); } catch { /* empty */ }
     if (!res.ok) {
       if (res.status === 401 && t) { Dal.logout(true); }

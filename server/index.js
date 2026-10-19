@@ -958,5 +958,22 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-if (require.main === module) server.listen(PORT, '0.0.0.0', () => console.log(require('./say')(`🏡 دال روی پورت ${PORT} در حال اجراست → http://localhost:${PORT}`, `Dal is running on port ${PORT} -> open http://localhost:${PORT} in your browser. Keep this window open.`)));
+if (require.main === module) {
+  server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+      console.error(require('./say')(`⛔ پورت ${PORT} پر است؛ احتمالاً دال از قبل روشن است. همین الان در مرورگر http://localhost:${PORT} را باز کنید، یا برای بستن نسخه‌ی قبلی بزنید: taskkill /F /IM node.exe`,
+        `\nSTOP: port ${PORT} is already in use. Dal is probably already running.\n  -> Open http://localhost:${PORT} in your browser, OR close the old copy with:  taskkill /F /IM node.exe  and run again.\n`));
+      process.exit(1);
+    }
+    throw e;
+  });
+  server.listen(PORT, '0.0.0.0', () => {
+    const url = `http://localhost:${PORT}`;
+    console.log(require('./say')(`🏡 دال روی پورت ${PORT} در حال اجراست → ${url}`, `Dal is running on port ${PORT} -> open ${url} in your browser. Keep this window open.`));
+    // روی ویندوز، مرورگر خودکار باز می‌شود (با DAL_NO_OPEN=1 خاموش می‌شود)
+    if (process.platform === 'win32' && !process.env.DAL_NO_OPEN && process.stdout.isTTY) {
+      try { require('node:child_process').spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true, windowsHide: true }).unref(); } catch { /* ignore */ }
+    }
+  });
+}
 module.exports = { server, routes };
