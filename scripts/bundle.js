@@ -31,7 +31,7 @@ const out = `#!/usr/bin/env node
  * نیازمند Node.js ۲۲٫۱۳ یا بالاتر. بدون npm install.
  *
  *   node dal.js                       اجرای سایت (پورت ۳۰۰۰؛ متغیر PORT)
- *   node dal.js admin 09123456789     ساخت مدیر      |  stats | backup | reset-password
+ *   node dal.js admin 09123456789     ساخت مدیر      |  stats | backup | reset-password | doctor
  *
  * داده‌ها در پوشه‌ی data کنار همین فایل ذخیره می‌شوند (متغیر DAL_DATA_DIR برای تغییر).
  * این فایل خودش را در پوشه‌ی .dal-app کنار فایل باز می‌کند (فقط وقتی نسخه عوض شده باشد).
@@ -57,7 +57,8 @@ if (!fs.existsSync(stamp) || fs.readFileSync(stamp, 'utf8') !== VERSION) {
   fs.writeFileSync(stamp, VERSION);
 }
 const cli = ['admin', 'reset-password', 'backup', 'stats', 'warm-tiles'].includes(process.argv[2]);
-const args = cli ? ['--no-warnings', path.join(APP, 'server', 'cli.js'), ...process.argv.slice(2)] : ['--no-warnings', path.join(APP, 'server', 'index.js')];
+const doctor = process.argv[2] === 'doctor';
+const args = doctor ? ['--no-warnings', path.join(APP, 'server', 'doctor.js')] : cli ? ['--no-warnings', path.join(APP, 'server', 'cli.js'), ...process.argv.slice(2)] : ['--no-warnings', path.join(APP, 'server', 'index.js')];
 const child = spawn(process.execPath, args, { stdio: 'inherit', env: { ...process.env, DAL_DATA_DIR: process.env.DAL_DATA_DIR || path.join(HOME, 'data') } });
 for (const s of ['SIGINT', 'SIGTERM']) process.on(s, () => child.kill(s));
 child.on('exit', (code) => process.exit(code ?? 0));

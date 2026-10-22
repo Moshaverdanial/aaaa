@@ -34,3 +34,5 @@ F) Check the download: dir dal.js  -> about 3,100,000 bytes. If tiny or error: d
 G) Browser address must start with http:// (NOT https). Do not click inside the black window (it pauses the server; press Enter to resume).
 H) Server check from a 2nd CMD: curl http://localhost:3000/api/setup/status  -> {"needsSetup":false}
 Full Persian guide: docs/ویندوز-از-صفر.md
+I) Health check: node dal.js doctor   (must end with RESULT: ALL GOOD)
+J) First start: the browser opens by itself on the admin-setup form (setup code is pre-filled).

@@ -969,10 +969,11 @@ if (require.main === module) {
   });
   server.listen(PORT, '0.0.0.0', () => {
     const url = `http://localhost:${PORT}`;
+    let openUrl = url; try { const t = require('./bootstrap').setupToken(); if (t) openUrl = `${url}/#/setup?token=${t}`; } catch { /* ignore */ }
     console.log(require('./say')(`🏡 دال روی پورت ${PORT} در حال اجراست → ${url}`, `Dal is running on port ${PORT} -> open ${url} in your browser. Keep this window open.`));
     // روی ویندوز، مرورگر خودکار باز می‌شود (با DAL_NO_OPEN=1 خاموش می‌شود)
     if (process.platform === 'win32' && !process.env.DAL_NO_OPEN && process.stdout.isTTY) {
-      try { require('node:child_process').spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true, windowsHide: true }).unref(); } catch { /* ignore */ }
+      try { require('node:child_process').spawn('cmd', ['/c', 'start', '', openUrl.replace(/&/g, '^&')], { stdio: 'ignore', detached: true, windowsHide: true }).unref(); } catch { /* ignore */ }
     }
   });
 }
